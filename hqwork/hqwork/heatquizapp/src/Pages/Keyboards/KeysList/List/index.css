@@ -1,0 +1,15 @@
+.key-list-view-assigned-key-code{
+    width: 15vw;
+}
+
+.key-list-view-selected-unassign-key-list{
+    width: 25vw;
+    max-width: 25vw;
+    max-height: 25vh;
+    overflow-y: scroll;
+}
+
+.reassign-keys-select-list{
+    width: 10vw;
+}
+

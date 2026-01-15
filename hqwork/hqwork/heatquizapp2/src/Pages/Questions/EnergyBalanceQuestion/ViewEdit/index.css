@@ -1,0 +1,77 @@
+.eb-question-view-edit-term-word{
+    padding: 5px;
+    font-size: smaller;
+
+}
+
+.eb-question-view-edit-term-direction-green{
+    color: green;
+    border: 1px solid green;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.eb-question-view-edit-term-direction-red{
+    color: red;
+    border: 1px solid red;
+    margin-right: 8px;
+    margin-left: 8px;
+
+}
+
+.eb-question-add-cv-image-container{
+    width: 40vw;
+    height: 20vw;
+}
+
+.eb-question-add-cv-image-inside{
+    width: 39vw;
+    height: 19vw;
+    object-fit: contain;
+}
+
+.eb-question-add-image-container{
+    width: 40vw;
+    height: 20vw;
+}
+
+.eb-question-add-image-inside{
+    width: 39vw;
+    height: 19vw;
+    object-fit: contain;
+}
+
+.edit-eb-question-comment-input{
+    width: 46vw;
+}
+
+
+.edit-eb-question-term-heading1{
+    font-size: large;
+    margin-bottom: 1vh;
+    border-bottom: 1px solid  rgb(235, 235, 235);
+}
+
+
+.edit-eb-question-term-heading1 > span{
+    padding-left: 0.25vw;
+    padding-right: 0.25vw;
+    font-weight: bold;
+}
+
+.edit-eb-question-term-heading2{
+    font-size: medium;
+    margin-bottom: 1vh;
+    padding: 0.25vmin;
+    background-color: whitesmoke;
+    width: fit-content;
+    border:  1px solid  rgb(235, 235, 235);
+    border-radius: 0.25rem;
+}
+
+
+.edit-eb-question-term-heading2 > span{
+    padding-left: 0.25vw;
+    padding-right: 0.25vw;
+    font-weight: bold;
+}

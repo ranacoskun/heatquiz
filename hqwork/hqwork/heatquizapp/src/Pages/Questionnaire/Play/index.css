@@ -1,0 +1,153 @@
+.QuestionnaireStartBox{
+    align-items: center;
+    align-content: center;
+
+    flex-direction: row;
+    display: flex;
+
+    width: 100%;
+}
+
+.QuestionnaireStartBoxInner{
+    border: 1px solid rgb(190, 190, 190);
+    border-radius: 0.25em;
+
+    margin: 1vmin;
+    padding: 1vmin;
+
+    background-color: rgba(250, 250, 250, 0.70);
+
+    width: 30vw;
+}
+
+.QuestionnaireStartInput{
+    width: 28vw;
+}
+
+.QuestionnaireImage{
+    width: 8vw;
+    height: 100%;
+    object-fit: contain;
+
+    cursor: zoom-in;
+}
+
+.QuestionnaireTab{
+    width: 95vw;
+}
+
+.QuestionnaireQuestionInfo{
+    background-color: rgba(245, 245, 245, 0.464);
+    height: fit-content;
+
+    border-radius: 0.25em;
+
+}
+
+.QuestionnaireQuestionImageZoom{
+    width: 30vw;
+    height: 30vw;
+
+    object-fit: contain;
+}
+
+.QuestionnaireQuestionImage{
+    width: 8vw;
+    height: 100%;
+
+    object-fit: contain;
+    margin: 0.5vmin;
+
+    cursor: zoom-in;
+
+}
+
+.QuestionnaireQuestionBody{
+    width: 20vw;
+    margin: 0.5vmin;
+}
+
+.QuestionnaireQuestionChoiceLine{
+    border: 2px solid rgba(180, 180, 180, 0.4);
+    border-radius: 0.125em;
+
+    margin: 0.4vmin;
+    padding: 0.25vmin;
+
+    margin-bottom: 1vh;
+
+    width: 100%;
+
+    cursor: pointer;
+}
+
+.QuestionnaireQuestionChoiceLineTextRangeInput{
+    border: 2px solid rgba(180, 180, 180, 0.4);
+
+    border-top-color: rgba(10, 57, 76, 0.5);
+
+    border-radius: 0.125em;
+
+    margin: 0.4vmin;
+    padding: 0.25vmin;
+
+    margin-bottom: 1vh;
+
+    width: 100%;
+}
+
+.QuestionnaireQuestionChoiceLineRangeInput{
+    margin-left: 5%;
+    width: 90%;
+    min-width: 20vmin;
+}
+
+.QuestionnaireQuestionChoiceLineTextInput{
+    min-width: 20vmin;
+}
+
+.QuestionnaireQuestionChoiceLine:hover{
+    border: 2px solid rgba(72, 102, 112, 0.4);
+}
+
+.QuestionnaireQuestionChoiceLineSelected{
+    border: 2px solid rgba(10, 57, 76, 0.2);
+    border-radius: 0.125em;
+
+    background-color: rgba(135, 207, 235, 0.201);
+
+    margin: 0.4vmin;
+    padding: 0.25vmin;
+
+    margin-bottom: 1vh;
+
+    width: 100%;
+
+    cursor: pointer;
+}
+
+.QuestionnaireQuestionChoiceLineInner{
+    padding: 0.8vmin;
+}
+
+.QuestionnaireQuestionChoiceImage{
+    width: 10vw;
+    height: 100%;
+
+    object-fit: contain;
+    padding: 0.5vmin;
+
+    cursor: zoom-in;
+}
+
+.QuestionnaireQuestionAnswered{
+    color: rgb(0, 157, 255);
+}
+
+.QuestionnaireControlButton{
+    color: #0275d8;
+}
+
+.QuestionnaireControlButton:hover{
+    background-color: rgba(235, 235, 235, 1);
+}

@@ -1,0 +1,107 @@
+.multiple-choice-question-play-info-row{
+    flex-direction: row;
+    display: flex;
+    align-items: flex-start;
+}
+
+.multiple-choice-question-play-img{
+    width: 12vw;
+    height: 12vw;
+    object-fit: contain;
+}
+
+.multiple-choice-question-play-choice-container{
+    margin: 0.5vmin;
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 0.25em;
+}
+
+.multiple-choice-question-play-choice-container-final-page{
+    margin: 0.5vmin;
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 0.25em;
+}
+
+.multiple-choice-question-play-choice-container-selected{
+    margin: 0.5vmin;
+    border-radius: 0.25em;
+    border: 1px solid #0275d8;
+    background-color: whitesmoke;
+
+}
+
+.multiple-choice-question-play-choice-container-selected-final-page{
+    margin: 0.5vmin;
+    border-radius: 0.25em;
+    border: 1px solid #0275d8;
+    background-color: whitesmoke;
+
+}
+
+.multiple-choice-question-play-choice-container-selected:hover{
+    margin: 0.5vmin;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
+
+.multiple-choice-question-play-choice-container:hover{
+    background-color: whitesmoke;
+    cursor: pointer;
+    color: #0275d8;
+}
+
+.multiple-choice-question-play-choice-container-inner{
+    padding: 0.5vmin;
+    flex-direction: row;
+    display: flex;
+    align-items: flex-start;
+}
+
+.multiple-choice-question-play-index{
+    padding-left: 0.25vw;
+    padding-right: 0.25vw;
+}
+
+.multiple-choice-question-play-choice-img{
+    width: 5vw;
+    min-width: 140px;
+
+    height: 5vw;
+    min-height: 140px;
+
+    object-fit: contain;
+}
+
+.multiple-choice-question-play-choice-container-correct{
+    border: 1px solid green;
+
+}
+
+.multiple-choice-question-play-choice-container-correct:hover{
+    background-color: none;
+    color: none;
+
+}
+
+.multiple-choice-question-play-choice-container-incorrect{
+    border: 1px solid red;
+}
+
+.multiple-choice-question-play-choice-container-incorrect:hover{
+    background-color: none;
+    color: none;
+}
+
+.multiple-choice-question-play-result-correct{
+    color: green;
+}
+
+.multiple-choice-question-play-result-incorrect{
+    color: red;
+}
+
+.multiple-choice-question-play-choice-correctness-section{
+    padding: 0.5vw;
+    width: 100%;
+}

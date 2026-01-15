@@ -1,0 +1,30 @@
+.clickable-question-play-container{
+    width: 100%;
+}
+
+.clickable-question-play-row{
+    width: 100%;
+}
+
+.clickable-question-pick-img{
+    width: 5vw;
+    min-width: 50px;
+    height: 5vw;
+    min-height: 50px;
+
+    object-fit: contain;
+    margin: 0.5vmin;
+    cursor: pointer;
+}
+
+.clickable-question-play-chart-component-base{
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgb(230, 230, 230);
+}
+
+.clickable-question-play-chart-component-title{
+    width: 100%;
+    text-align: center;
+}

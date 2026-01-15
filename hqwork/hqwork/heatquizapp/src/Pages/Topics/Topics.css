@@ -1,0 +1,25 @@
+.page-title{
+    padding-right: 2vw;
+}
+
+.topics-list-info-column{
+    width: 30vw;
+}
+
+.subtopic-questions-modal-list{
+    height: 75vh;
+    overflow-y: scroll;
+}
+
+
+.info-line-subtopic-view-questions{
+    flex-direction: column;
+    display: flex;
+    margin-bottom: 4vh;
+}
+
+.question-image-subtopic-view-questions{
+    width: 100%;
+    height: 15vh;
+    object-fit: contain;
+}

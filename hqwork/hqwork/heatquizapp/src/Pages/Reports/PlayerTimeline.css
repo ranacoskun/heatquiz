@@ -1,0 +1,21 @@
+.question-image-player-timeline{
+    width: 100%;
+    height: 15vh;
+    object-fit: contain;
+}
+
+.player-timeline-info-line{
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.player-timeline-series-line{
+    padding: 0.25vmin;
+    background-color: snow;
+}
+
+.player-timeline-datetime-score{
+    color: rgba(0, 0, 0, 0.45);
+}

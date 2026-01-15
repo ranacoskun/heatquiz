@@ -1,0 +1,56 @@
+.user-profile-picture{
+    width: 8vw;
+    height:  8vw;
+    object-fit: 'contain'
+}
+
+.user-profile-name{
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+.user-profile-card{
+    width: 70vw;
+}
+
+.ant-dropdown-trigger{
+ cursor: pointer;
+}
+
+.user-list-profile-picture{
+    width: 15vh;
+    height: 15vh;
+    object-fit: contain;
+}
+
+
+.settings-icon{
+    padding: 0.25vmin;
+}
+
+.user-profile-picture-uploader{
+    width: 35vh;
+    height: 35vh;
+}
+
+.new-profile-picture{
+    width: 32vh;
+    height: 32vh;
+    object-fit: contain;
+}
+
+.linked-keys-container{
+    width: 15vw;
+}
+
+.key-display-row{
+    margin-bottom: 1vh;
+}
+
+.key-display-container{
+    background-color: whitesmoke;
+}
+
+.switch-to-key-button{
+    cursor: pointer;
+}

@@ -1,0 +1,38 @@
+.recently-visited-maps-img{
+    height: 28.5vh;
+    width: 17.25vw;
+    min-width: 300px;
+    object-fit: contain;
+}
+
+.dashboard-info{
+    margin-left: 2.5vw;
+    width: 80vw;
+    max-height: 40vh;
+    min-height: 22vh;
+    overflow-y: scroll;
+    flex-direction: column;
+    display: flex;
+}
+
+.dashboard-info-title{
+    padding: 0.25em;
+    margin-bottom: 0.25em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom-width: 3px;
+    width: 100%;
+    min-width: 10vw;
+    max-width: 14.25vw;
+}
+
+.dashboard-info-line{
+    margin-bottom: 1em;
+    padding-bottom: 0.25em;
+
+    min-width: 10vw;
+    max-width: 14.25vw;
+    width: 100%;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom-width: 2px;
+}

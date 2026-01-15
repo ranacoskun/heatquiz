@@ -1,0 +1,39 @@
+.navigation-bar-click-trees-select{
+    width: 25vw;
+}
+
+.click-tree-head-container{
+    width: 15vw;
+}
+
+.click-tree-leaf-container{
+    width: 80vw;
+    overflow-x: scroll;
+    flex-direction: row;
+    display: flex;
+}
+
+.click-tree-leaf{
+    width: 10vw;
+}
+
+.click-tree-head-img{
+    width: 10vw;
+    object-fit: contain;
+}
+
+.click-tree-leaf-img{
+    width: 8vw;
+}
+
+.tree-picture-uploader{
+    width: 35vh;
+    height: 35vh;
+}
+
+.new-tree-picture{
+    width: 32vh;
+    height: 32vh;
+    object-fit: contain;
+}
+

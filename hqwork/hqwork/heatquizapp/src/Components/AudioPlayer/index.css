@@ -1,0 +1,9 @@
+.audio-close-button{
+    background-color: whitesmoke;
+    border-radius: 1.5vmin;
+    padding: 1vmin;
+}
+
+.audio-close-button:hover{
+    border: 1px solid gray;
+}

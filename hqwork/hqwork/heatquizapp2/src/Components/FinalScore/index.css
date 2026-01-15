@@ -1,0 +1,6 @@
+.final-score-component{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.15vmin;
+    margin-bottom: 1vh;
+}

@@ -1,0 +1,1 @@
+export const MAX_QUESTION_CODE = 70

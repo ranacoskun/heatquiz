@@ -1,0 +1,13 @@
+
+.notifications-search-input{
+    flex-direction: column;
+    display: flex;
+    width: 15vw;
+    min-width: 180px; 
+}
+
+.notifications-search-btn{
+    margin-top: 1vmin;
+    width: 7vw;
+    min-width: 120px;
+}

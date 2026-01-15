@@ -1,0 +1,58 @@
+.question-edit-view-info-card-base{
+    flex-direction: row;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.question-edit-view-info-card{
+    flex-direction: column;
+    display: flex;
+    align-items: flex-start;
+}
+
+.question-edit-view-info-title{
+    font-size: large;
+}
+
+
+.question-edit-view-info-card{
+    padding: 0.25vw;
+    border: 1px solid rgb(235, 235, 235);
+    border-radius: 0.25em;
+    background-color: rgb(250, 250, 250);
+    margin-left: 0.5vw;
+}
+
+.question-edit-view-info-card-gray{
+    font-size: small;
+    color: gray;
+}
+
+.question-edit-view-gray{
+    color: gray;
+}
+
+.question-edit-view-info-card-green{
+    font-size: small;
+    color: green;
+}
+
+.question-edit-view-info-card-red{
+    font-size: small;
+    color: red;
+}
+
+.question-edit-view-edit-basic-info-topic-subtopic-section{
+    flex-direction: column;
+    display: flex;
+}
+
+.question-edit-view-edit-basic-info-topic-subtopic-section-select{
+    width: 20vw
+}
+
+.question-edit-view-upload-solution-pdf{
+    width: 100%;
+    height: 100%;
+}

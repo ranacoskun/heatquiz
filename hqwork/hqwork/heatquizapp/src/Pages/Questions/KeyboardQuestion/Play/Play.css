@@ -1,0 +1,35 @@
+.keyboard-question-play-info-row{
+    flex-direction: row;
+    display: flex;
+    align-items: flex-start;
+}
+
+.keyboard-question-play-img{
+    width: 12vw;
+    height: 12vw;
+   
+    object-fit: contain;
+}
+
+.keyboard-question-play-info-answer-line{
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.keyboard-question-play-warning-text{
+    color: red;
+    padding: 0.5vmin;
+    border-radius: 0.25em;
+    border: 1px solid rgb(235, 235, 235);
+    background-color: rgb(251, 251, 251);
+}
+
+.keyboard-question-play-result-correct{
+    color: green;
+}
+
+.keyboard-question-play-result-incorrect{
+    color: red;
+}
+

@@ -1,0 +1,15 @@
+.background-images-list-img{
+    width: 15vh;
+    object-fit: contain;
+}
+
+.add-background-image-img-box{
+    width: 20vw;
+    height: 20vw;
+}
+
+.add-background-image-inside-img{
+    width: 19vw;
+    height: 19vw;
+    object-fit: contain;
+}

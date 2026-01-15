@@ -1,0 +1,16 @@
+.add-fbd-question-hide-element{
+    opacity: 0%;
+}
+
+.add-fbd-vt-term-type{
+    width: 12vw;
+}
+
+.add-fbd-input{
+    width: 40vmin;
+}
+
+.add-fbd-item-in-list{
+    width: 40vw;
+    justify-content: space-between;
+}

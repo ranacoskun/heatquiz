@@ -1,0 +1,109 @@
+.please-select-area-special:hover > .default-gray{
+    color: green;
+}
+
+.please-select-area-special-delete:hover > .default-gray{
+    color: red;
+}
+
+.map-edit-view-basic-list{
+    height: 67vh;
+    overflow-y: scroll;
+}
+
+.map-element-inside-img{
+    width: 100%;
+    cursor: pointer;
+    text-align: center;
+}
+
+.map-element-inside-img > img {
+    width: 100%;
+}
+
+
+.map-element-btn{
+    width: 100%;
+}
+
+
+.map-element-upload-pdf{
+    width: 20vw;
+    height: 28.28vw;
+    justify-content: center;
+}
+
+.map-element-upload-pdf-internal{
+    width: 19vw;
+    height: 26.87vw;
+    justify-content: center;
+}
+
+.map-badge-small-img{
+    width: 5vw;
+    object-fit: contain;
+}
+
+.add-badge-system-badge-img-box{
+    width: 5vw;
+    height: 5vw;
+}
+
+.add-badge-system-badge-img-box-inside-img{
+    width: 4vw;
+    height: 4vw;
+    object-fit: contain;
+}
+
+.add-badge-system-badge-img-box-inside-img{
+    width: 4vw;
+    height: 4vw;
+    object-fit: contain;
+}
+
+.add-badge-system-entity-container{
+    width: 100%;
+    height: 20vw;
+
+}
+
+.assign-badges-element-selected-badge{
+    border: 1px solid #0275d8;
+    background-color: whitesmoke;
+}
+
+.assign-badges-element-select-element{
+    width: 15vw;
+}
+
+.assign-badges-element-badge-img{
+    width: 100%;
+    height: 20vh;
+    object-fit: contain;
+}
+
+.assign-badges-element-non-selectable-badge{
+    opacity: 40%;
+}
+
+
+.attach-map-to-element-img{
+    width: 100%;
+    height: 20vh;
+    object-fit: contain;
+}
+
+.assign-relations-element-select-element{
+    width: 15vw;
+}
+
+.edit-map-image-container{
+    width: 25vw;
+    height: 35vw;
+}
+
+.edit-map-image-inside{
+    width: 24vw;
+    height: 34vw;
+    object-fit: contain;
+}

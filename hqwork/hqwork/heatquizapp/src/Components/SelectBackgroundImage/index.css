@@ -1,0 +1,10 @@
+.select-background-img-container{
+    padding: 0.25vw;
+    border-radius: 0.5em;
+    border: 1px solid #d9d9d9;
+}
+
+.select-background-img-img{
+    width: 100%;
+    object-fit: contain;
+}

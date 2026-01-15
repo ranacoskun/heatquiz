@@ -1,0 +1,6 @@
+.recently-visited-maps-img{
+    height: 28.5vh;
+    width: 17.25vw;
+    min-width: 300px;
+    object-fit: contain;
+}

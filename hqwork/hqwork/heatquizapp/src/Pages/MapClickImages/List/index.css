@@ -1,0 +1,16 @@
+.add-map-click-list-img-box{
+    width: 10vw;
+    height: 10vw;
+}
+
+.add-map-click-list-inside-img{
+    width: 8vw;
+    height: 8vw;
+    object-fit: contain;
+}
+
+
+.edit-map-click-list-seleect-type{
+    width: 10vw;
+    margin-top: 2vh;
+}

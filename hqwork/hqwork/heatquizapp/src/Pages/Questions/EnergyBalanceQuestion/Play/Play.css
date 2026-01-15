@@ -1,0 +1,72 @@
+.eb-question-control-volume{
+    border: 1px solid gainsboro;
+    margin-bottom: 1vh;
+}
+
+.eb-question-erm-direction-container{
+   flex-direction: row;
+   display: flex;
+}
+
+.eb-question-term-direction-inactive{
+    color: gainsboro;
+    border: 1px solid gainsboro;
+}
+
+.eb-question-term-direction-green{
+    color: green;
+    border: 1px solid green;
+}
+
+.eb-question-term-direction-red{
+    color: red;
+    border: 1px solid red;
+}
+
+.eb-question-term-direction-neutral{
+    color: #428bca;
+    border: 1px solid #428bca;
+}
+
+.eb-question-term-word{
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.eb-question-term-selected-define{
+    background-color: aliceblue;
+}
+
+.eb-question-term-selected-answered{
+    background-color: #ebffe6;
+}
+
+.eb-question-term-answer-zone{
+    border-bottom: 1px solid lightblue;
+    min-width: 40vw;
+}
+
+.eb-question-bc-ic-line{
+   margin-bottom: 2vh;
+}
+
+.eb-question-red-background{
+    background-color: rgba(255, 0, 0, 0.05);
+    border: 1px solid rgba(255, 0, 0, 0.15);
+    padding: 0.25vmin;
+ }
+
+ .eb-question-question-final-score{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.15vmin;
+    margin-bottom: 1vh;
+ }
+ 
+.eb-question-question-body{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.15vmin;
+    margin-bottom: 1vh;
+ }
+ 

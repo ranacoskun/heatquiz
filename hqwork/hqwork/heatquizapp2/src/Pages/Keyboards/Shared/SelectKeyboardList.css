@@ -1,0 +1,16 @@
+.keyboard-search-list-container {
+    padding: 0.25vmin;
+    border: 1px solid rgb(240, 240, 240);
+    border-radius: 0.25em;
+
+    margin-bottom: 1vh;
+
+    width: 100%;
+
+    justify-content: space-between;
+}
+
+.keyboard-search-list-sub-info{
+    flex-direction: column;
+    display: flex;
+}

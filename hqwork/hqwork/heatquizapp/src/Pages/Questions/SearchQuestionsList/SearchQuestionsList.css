@@ -1,0 +1,15 @@
+.question-list-component-item-container-0{
+    width: 100%;
+    margin-bottom: 2vh;
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 0.25em;
+    min-height: max-content;
+}
+
+.question-list-component-item-selected{
+    background-color: whitesmoke;
+}
+
+.question-list-component-correct-stats{
+    color: green;
+}

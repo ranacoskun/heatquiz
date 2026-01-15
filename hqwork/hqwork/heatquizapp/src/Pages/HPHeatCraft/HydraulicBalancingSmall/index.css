@@ -1,0 +1,82 @@
+.parameters-panel{
+    background-color: rgba(245, 245, 220, 0.5);
+    padding: 1vmin;
+    border-radius: 0.5em;
+    border: 1px solid #D7D8D9;
+}
+
+.control-diagrams-panel{
+    background-color: rgba(220, 232, 245, 0.5);
+    padding: 1vmin;
+    border-radius: 0.5em;
+    border: 1px solid #D7D8D9;
+}
+
+.highlighted-layer{
+    color: gray;
+    cursor: pointer;
+}
+
+.highlighted-layer:hover{
+    color: #0275d8;
+}
+
+.room-box{
+    stroke: rgba(0,0,0,0.2);
+    fill: transparent;
+    stroke-width: 1;    
+    cursor: pointer;
+}
+
+.room-number {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+
+    background: #fff;
+    border: 2px solid #0B75BD;
+    color: red;
+    text-align: center;
+
+    font: 32px Arial, sans-serif;
+}
+
+.room-box:hover{
+    stroke: rgba(0,0,0,0.4);
+    cursor: pointer;
+}
+
+.room-add-box-none{
+    display: none;
+}
+
+.room-add-box{
+    cursor: pointer;
+    opacity: 0;
+}
+.room-add-box:hover{
+    opacity: 1;
+}
+
+.room-add-box-inside{
+    fill: green;
+    animation: fillColor 2s infinite;
+}
+
+@keyframes fillColor{
+    0%{fill: rgba(0, 128, 0, 0.2);}
+    50%{fill: green;}
+    100%{fill: rgba(0, 128, 0, 0.2);}
+}
+
+.room-add-box-border{
+    stroke: green;
+    animation: borderColor 2s infinite;
+}
+
+@keyframes borderColor{
+    0%{stroke: rgba(0, 128, 0, 0.2);}
+    50%{stroke: green;}
+    100%{stroke: rgba(0, 128, 0, 0.2);}
+}

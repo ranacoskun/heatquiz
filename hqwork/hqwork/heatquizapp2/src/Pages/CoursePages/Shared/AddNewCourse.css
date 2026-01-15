@@ -1,0 +1,10 @@
+.thumbnail-uploader{
+    height: 24vh;
+    padding-bottom: 2vh;
+}
+
+.new-course-photo{
+    height: 20vh;
+    width: 100%;
+    object-fit: contain;
+}

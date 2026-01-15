@@ -1,0 +1,40 @@
+.keyboard-key-item{
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 0.25em;
+    background-color: whitesmoke;
+    
+    margin-right: 0.5vw;
+    margin-bottom: 0.5vw;
+
+    min-width: 50px;
+
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keyboard-key-item-variable{
+    background-color: cornsilk;
+
+}
+
+.keyboard-key-item-operand{
+    background-color: snow;
+
+}
+
+.keyboard-key-item-operand-remove{
+    background-color: floralwhite;
+
+}
+
+.keyboard-key-item:hover{
+    cursor: pointer;
+    border: 1px solid rgb(200, 200, 200);
+}
+
+.keyboard-key-item-inner{
+    margin-left: 1vw;
+    margin-right: 1vw;
+}

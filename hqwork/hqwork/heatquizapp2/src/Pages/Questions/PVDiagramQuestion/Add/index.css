@@ -1,0 +1,37 @@
+.pv-question-add-image-container{
+    width: 40vw;
+    height: 20vw;
+}
+
+.pv-question-add-image-inside{
+    width: 39vw;
+    height: 19vw;
+    object-fit: contain;
+}
+
+.add-pv-d-question-tabs{
+    width: 35vw;
+}
+
+.add-q-pv-d-conditions-shape-name{
+    width: 5vw;
+}
+
+.add-q-pv-d-conditions-list{
+    height: 65vh;
+    overflow-y: scroll;
+}
+
+.add-q-pv-d-navigation-bar-groups-select{
+    width: 20vw;
+}   
+
+.add-q-pv-d-group-code{
+    width: 20vw;
+}  
+
+.add-q-pv-d-comment-input{
+    width: 20vw;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+}

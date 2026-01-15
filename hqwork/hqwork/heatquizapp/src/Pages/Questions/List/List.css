@@ -1,0 +1,118 @@
+.question-search-container{
+    background-color: whitesmoke;
+    border-radius: 0.25em;
+    border: 1px solid rgb(220, 220, 220);
+}
+
+.question-search-inner-container{
+    padding: 0.25vi;
+}
+
+.question-search-input-container{
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+}
+
+.question-search-input-column{
+    flex-direction: column;
+    display: flex;
+    width: 15vw;
+}
+
+.question-search-pages-input-column{
+    flex-direction: column;
+    display: flex;
+    margin-left: 2vw;
+    width: 100%;
+}
+
+.question-search-criteria-buttons-container{
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.question-search-criteria-container{
+    min-width: 30vw;
+    
+}
+
+.question-search-criteria{
+    flex-direction: column;
+    display: flex;
+    min-width: 15vw;
+}
+
+.search-critera-buttons-section{
+    width: 100%;
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+}
+
+.suffix-word{
+    color: rgba(0, 0, 0, 0.25);
+}
+
+.question-search-criteria-play-stats-input{
+    width: 10vw;
+}
+
+.pages-single-row{
+    border-top: 1px solid rgb(235, 235, 235);
+    margin-top: 0.5vh;
+    padding-bottom: 0.5vh;
+    width: 100%;
+    padding-left: 1%;
+}
+
+.question-list-item-container-0{
+    width: 49%;
+    margin-right: 0.4%;
+    margin-left: 0.4%;
+    margin-bottom: 2vh;
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 0.25em;
+    min-height: max-content;
+
+}
+
+.question-list-item-container-0-internal{
+    width: 100%;
+    padding: 0.25vi;
+
+    flex-direction: row;
+    display: flex;
+}
+
+.question-list-item-container-1{
+    width: 20vw;
+}
+
+
+.question-list-item-code:hover{
+    padding-left: 0.125vw;
+    padding-right: 0.125vw;
+    border-radius: 0.25em;
+    background-color: whitesmoke;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.question-list-item-img{
+    height: 25vh;
+    max-width: 15vw;
+    object-fit: contain;
+
+    margin-left: 0.5vw;
+    margin-right: 0.5vw;
+}
+
+.question-list-item-stats{
+    flex-direction: column;
+    display: flex;
+    padding-left: 0.125vw;
+    padding-right: 0.125vw;
+}

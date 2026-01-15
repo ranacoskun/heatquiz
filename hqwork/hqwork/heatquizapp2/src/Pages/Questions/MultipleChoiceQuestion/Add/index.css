@@ -1,0 +1,18 @@
+.add-multiple-choice-question-new-choice-latex-box{
+    width: 30vw;
+}
+
+.add-multiple-choice-question-img-box{
+    width: 10vw;
+    height: 10vw;
+}
+
+.add-multiple-choice-question-img-box-inside-img{
+    width: 8vw;
+    height: 8vw;
+    object-fit: contain;
+}
+
+.add-multiple-choice-question-correct-false{
+    width: 5vw;    
+}

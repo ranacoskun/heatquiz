@@ -1,0 +1,92 @@
+
+.page-header{
+    height: 50px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 4px 20px 4px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    position: fixed;
+    top: 0;
+    margin-bottom: 1vh;
+    background-color: whitesmoke;
+    justify-content: space-between;
+}
+
+.navigation-menu{
+    background-color: transparent;
+    width: calc(100% - 200px);
+}
+
+.navigation-drawer{
+    float: left;
+    align-items: center;
+}
+
+.user-datapool-navigation{
+    float: right;
+}
+
+.navigation-bar-datapools-select{
+    width: 15vw;
+    min-width: 160px;
+    align-items: center;
+}
+
+.navigation-bar-datapools-select-spin{
+    width: 250px;
+}
+
+.ant-select-selection-item{
+    color: gray;
+}
+
+.navigation-bar-user-avatar{
+    background-color: deepskyblue;
+}
+
+.navigation-bar-user-avatar:hover{
+    background-color: rgba(0, 191, 255, 0.8);
+}
+
+.navigation-bar-notification-avatar{
+    background-color: deepskyblue;
+}
+
+.navigation-bar-notification-avatar:hover{
+    background-color: rgba(0, 191, 255, 0.8);
+}
+
+.hq-app-logo-large{
+    width: 20vw;
+    max-height: 43px;
+    object-fit: contain;
+    float: left;
+    cursor: pointer;
+}
+
+.hq-app-logo-small{
+    width: 30px;
+    max-height: 30px;
+    object-fit: contain;
+    float: left;
+    cursor: pointer;
+}
+
+@media screen and (max-width:420px) {
+    .hq-app-logo-large{
+        display: none;
+    }
+}
+
+@media screen and (min-width:421px) {
+    .hq-app-logo-small{
+        display: none;
+    }
+}
+
+.notification-question-img{
+    height: 20vh;
+    width: '100%';
+    object-fit: contain;
+}

@@ -1,0 +1,52 @@
+.pv-diagram-question-question-body{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.15vmin;
+    margin-bottom: 1vh;
+
+    width: 100%;
+    min-width: 30vw;
+ }
+ 
+ .play-pv-diagram-question-point-summary-line{
+    padding-bottom: 1.5vh;
+ }
+
+ .play-pv-diagram-question-relation-summary-line{
+    padding-bottom: 1.5vh;
+ }
+
+ .pv-diagram-question-final-score{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.15vmin;
+ }
+
+ .pv-diagram-question-sub-score{
+   background-color: rgba(255, 255, 255, 0);
+   border: 1px solid rgba(0, 140, 255, 0.25);
+   padding: 0.15vmin;
+   margin-top: 1vh;
+   margin-bottom: 1vh;
+ }
+
+
+.play-q-pv-diagram-correct-solution{
+    background-color: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.15);
+    margin-bottom: 0.25vh;
+    padding-left: 0.5vw;
+    padding-right: 0.5vw;
+}
+
+.play-q-pv-diagram-your-solution{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    margin-bottom: 0.25vh;
+    padding-left: 0.5vw;
+    padding-right: 0.5vw;
+}
+
+.play-q-pv-d-navigation-bar-groups-select{
+   width: 15vw;
+}   

@@ -1,0 +1,51 @@
+.datapools-edit-view-element{
+    border: 1px solid rgb(235, 235, 235);
+    border-radius: 0.25em;
+    padding: 0.25vw;
+    margin-bottom: 1vh;
+}
+
+.datapools-edit-view-element-internal{
+    padding: 0.25vw;
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.datapools-edit-view-element-header{
+    justify-content: space-between;
+}
+
+.datapools-edit-view-element-code{
+    margin-bottom: 1vh;
+    color: gray;
+    width: fit-content;
+}
+
+
+.datapools-edit-view-element-gray{
+    color: gray;
+}
+
+.datapools-edit-view-element-red{
+    color: lightcoral;
+}
+
+.datapools-edit-view-element-code:hover{
+    color: blue;
+    padding-left: 0.25vw;
+    padding-right: 0.25vw;
+    border-radius: 0.25em;
+    background-color: whitesmoke;
+    cursor: pointer;
+}
+
+.datapools-edit-view-element-used-questions:hover{
+    color: blue;
+    padding-left: 0.25vw;
+    padding-right: 0.25vw;
+    border-radius: 0.25em;
+    background-color: whitesmoke;
+    cursor: pointer;
+    width: fit-content;
+}

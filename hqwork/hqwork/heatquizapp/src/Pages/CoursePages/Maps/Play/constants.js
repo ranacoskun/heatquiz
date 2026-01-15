@@ -1,0 +1,1 @@
+export const MAP_SCALE_REDUCTION = [1, 1.25, 1.5, 2, 3, 4, 5, 6, 7, 8]

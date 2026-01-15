@@ -1,0 +1,23 @@
+.navigation-bar-interpreted-trees-select{
+    width: 25vw;
+}
+
+.interpreted-tree-head-img{
+    width: 10vw;
+    object-fit: contain;
+}
+
+.tree-picture-uploader{
+    width: 35vh;
+    height: 35vh;
+}
+
+.new-tree-picture{
+    width: 32vh;
+    height: 32vh;
+    object-fit: contain;
+}
+
+.add-interpreted-images-values-bar{
+    width: 5vw;
+}

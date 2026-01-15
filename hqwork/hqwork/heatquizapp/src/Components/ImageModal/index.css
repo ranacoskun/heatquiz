@@ -1,0 +1,11 @@
+.image-modal{
+    cursor: pointer;
+}
+
+.image-model-img{
+    width: 100%;
+    object-fit: contain;
+
+    max-height: 80vh;
+    max-width: 80vw;
+}

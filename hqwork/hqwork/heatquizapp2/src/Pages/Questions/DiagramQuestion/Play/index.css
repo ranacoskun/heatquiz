@@ -1,0 +1,57 @@
+.d-q-control-area{
+    width: 40vw;
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.4vmin;
+    margin-bottom: 2vh;
+}
+
+.d-q-error-message{
+    background-color: rgba(232, 246, 250, 0.603);
+    width: fit-content;
+}
+
+.d-question-final-score{
+    background-color: rgba(0, 140, 255, 0.05);
+    border: 1px solid rgba(0, 140, 255, 0.15);
+    padding: 0.15vmin;
+    margin-bottom: 1vh;
+ }
+
+.d-q-summary-area{
+    width: 40vw;
+}
+
+ .d-q-summary-line{
+    margin-bottom: 1vh;
+ }
+
+ .d-q-summary-line:hover{
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 255, 0.25);
+    background-color: rgba(209, 225, 238, 0.05);
+}
+
+.d-q-summary-line-animated{
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 255, 0.25);
+    background-color: rgba(209, 225, 238, 0.05);
+ }
+
+ .d-q-summary-relation-box{
+    background-color: rgba(209, 225, 238, 0.05);
+    border: 1px solid rgba(130, 130, 131, 0.15);
+    padding: 0.4vmin;
+    margin-bottom: 2vh;
+    margin-right: 1vmin;
+}
+ 
+.d-q-summary-relation-box:hover{
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 255, 0.25);
+}
+
+.d-q-summary-relation-box-animated{
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 255, 0.25);
+}

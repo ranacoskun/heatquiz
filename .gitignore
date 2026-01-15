@@ -1,0 +1,159 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE and Editor Files
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Node.js / npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnp
+.pnp.js
+.npm
+.eslintcache
+
+# React / Frontend Build Outputs
+build/
+dist/
+*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# .NET / C# Build Artifacts
+bin/
+obj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.pidb
+*.svclog
+*.scc
+*.vspscc
+*.vssscc
+.vs/
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.cachefile
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+publish/
+*.nupkg
+**/packages/*
+!**/packages/build/
+*.pubxml
+*.publishproj
+*.publishsettings
+
+# Database Files
+*.mdf
+*.ldf
+*.dump
+*.backup
+# Keep main SQL schema file but ignore backups
+quizdb_backup*.dump
+*_backup*.sql
+*_backup*.dump
+
+# Archive Files (usually don't need to commit)
+*.rar
+*.zip
+*.7z
+*.tar
+*.gz
+hqwork.rar
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+*.test.js.snap
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Package Manager Locks (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+
+# TypeScript
+*.tsbuildinfo
+
+# Webpack
+.webpack/
+
+# Miscellaneous
+*.orig
+*.rej
+.cache/
+.parcel-cache/

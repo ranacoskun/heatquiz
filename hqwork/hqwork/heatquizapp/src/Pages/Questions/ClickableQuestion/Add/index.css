@@ -1,0 +1,26 @@
+.clickable-question-add-element{
+    cursor: pointer;
+    border: 1px solid #0275d8;
+}
+
+.clickable-question-add-image-container{
+    width: 40vw;
+    height: 20vw;
+}
+
+.clickable-question-add-image-container-hover{
+    background-color: whitesmoke;
+}
+
+.clickable-question-add-image-inside{
+    width: 39vw;
+    height: 19vw;
+    object-fit: contain;
+}
+
+.clickable-question-element-answer-box{
+    width: 150px;
+    height:  150px;
+    border: 1px solid rgb(240, 240, 240);
+    cursor: pointer;
+}

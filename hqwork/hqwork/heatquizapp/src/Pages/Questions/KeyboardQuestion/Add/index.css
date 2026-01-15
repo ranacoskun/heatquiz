@@ -1,0 +1,30 @@
+.add-keyboard-question-new-choice-latex-box{
+    width: 30vw;
+}
+
+.add-keyboard-question-img-box{
+    width: 10vw;
+    height: 10vw;
+}
+
+.add-keyboard-question-img-box-inside-img{
+    width: 8vw;
+    height: 8vw;
+    object-fit: contain;
+}
+
+.add-keyboard-answer-line{
+    width: 100%;
+    justify-content: flex-start;
+
+    padding: 0.5vmin;
+    border: 1px solid rgb(235, 235, 235);
+
+    border-radius: 0.25em;
+
+    margin-bottom: 2vh;
+}
+
+
+
+

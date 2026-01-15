@@ -1,0 +1,75 @@
+
+.series-edit-view-info-card{
+    flex-direction: column;
+    display: flex;
+    align-items: flex-start;
+}
+
+.series-edit-view-info-other-card{
+    padding: 0.25vw;
+    border: 1px solid rgb(235, 235, 235);
+    border-radius: 0.25em;
+    background-color: rgb(250, 250, 250);
+    margin-left: 0.5vw;
+}
+
+.series-edit-view-pools-number{
+    color: gray;
+    margin-top: 1vh;
+}
+
+.series-edit-view-element{
+    border: 1px solid rgb(235, 235, 235);
+    border-radius: 0.25em;
+    padding: 0.25vw;
+    margin-bottom: 1vh;
+}
+
+.series-edit-view-element-internal{
+    padding: 0.25vw;
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.series-edit-view-element-code{
+    margin-bottom: 1vh;
+    color: gray;
+}
+
+.series-edit-view-element-img{
+    object-fit: contain;
+    height: 20vh;
+}
+
+
+.series-relation-map-img{
+    width: 15vw;
+    object-fit: contain;
+}
+
+.series-edit-view-add-questions{
+    align-items: flex-start;
+    display: flex;
+}
+
+.series-edit-view-element-selected-moving{
+    color: orange;
+    cursor: pointer;
+}
+
+.series-edit-view-element-selected-pool-word{
+    color: gray;
+    font-weight: normal;
+}
+
+.series-edit-view-element-selected-pool-assign{
+    color: blue;
+    cursor: pointer;
+    padding-left: 0.25vw;
+    padding-right: 0.25vw;
+    background-color: whitesmoke;
+    border-radius: 0.25em;
+    font-weight: normal;
+    width: fit-content;
+}
