@@ -28,8 +28,9 @@ import { DiagramQuestionPlay } from "../../Pages/Questions/DiagramQuestion/Play"
 import { PVDiagramQuestionPlay } from "../../Pages/Questions/PVDiagramQuestion/Play";
 import { Timer } from "../Timer/Timer";
 import { PlayQuestionnaireInSeries } from "../../Pages/Questionnaire/PlayInSeries/PlayQuestionnaireInSeries";
+import { SelfReflectionPhase } from "./SelfReflectionPhase";
 
-export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapName, mapElementName}){
+export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapName, mapElementName, mapId, goals}){
     
     const { 
         isLoadingSeries, Series, getSeries, errorGetSeries,
@@ -441,7 +442,7 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
                 size={'large'}
             >
                 <div
-                    URL={Base_ImageURL}
+                    data-url={Base_ImageURL}
                     id = {Code}
                 >
                     <img 
@@ -842,8 +843,26 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
             }
         }
 
+        // Calculate success rate for self-reflection (map 31 only)
+        const isMap31 = String(mapId) === "31";
+        let correctCount = 0;
+        let totalQuestions = playedElements.length;
+        
+        if (isMap31 && playedElements.length > 0) {
+            correctCount = playedElements.filter(e => e.Correct).length;
+        }
+
         return(
-            <Row>
+            <div>
+                {isMap31 && totalQuestions > 0 && (
+                    <SelfReflectionPhase
+                        totalQuestions={totalQuestions}
+                        correctCount={correctCount}
+                        playedElements={playedElements}
+                        goals={goals || []}
+                    />
+                )}
+                <Row>
                 {seriesElements.map((e, ei) => {
                      const {Question} = e
                      const {Code, Type, PDFURL} = Question
@@ -1004,7 +1023,8 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
                         </Col>
                     )
                 })}
-            </Row>
+                </Row>
+            </div>
         )
     }
 

@@ -104,8 +104,8 @@ export function ClickableQuestionPlay({Id, deadLoad, onUpdateSeriesPlayElements,
         }
 
         const status = [
-            ...ClickImages.map((a, ai) => (a.Answer.Id === elementAnswers[ai].Id)),
-            ...ClickCharts.map((a, ai) => (a.Answer.Id === elementAnswers[ai + ClickImages.length].Id))
+            ...ClickImages.map((a, ai) => (elementAnswers[ai] && a.Answer.Id === elementAnswers[ai].Id)),
+            ...ClickCharts.map((a, ai) => (elementAnswers[ai + ClickImages.length] && a.Answer.Id === elementAnswers[ai + ClickImages.length].Id))
         ]
 
         const score = (status.filter(a => a).length) + '/' + status.length

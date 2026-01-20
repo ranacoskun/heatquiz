@@ -2,6 +2,7 @@ import React from "react";
 import { PagesWrapper } from "../../../../PagesWrapper";
 import { useParams } from "react-router-dom";
 import { useMaps } from "../../../../contexts/MapsContext";
+import { useSeries } from "../../../../contexts/SeriesContext";
 import { useEffect } from "react";
 import { Button, Col, FloatButton, Input, Modal, Result, Row, Skeleton, Space, message, notification } from "antd";
 import { useState } from "react";
@@ -16,6 +17,7 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { ErrorComponent } from "../../../../Components/ErrorComponent";
 import { PlayQuestionnaireInSeries } from "../../../Questionnaire/PlayInSeries/PlayQuestionnaireInSeries";
 import { AudioPlayerComponent } from "../../../../Components/AudioPlayer/AudioPlayer";
+import { ForethoughtPhase } from "./ForethoughtPhase";
 
 var PDF_BTN = require('./Images/Button_PDF.png')
 var VIDEO_BTN = require('./Images/Button_Video.png')
@@ -27,6 +29,9 @@ export function MapPlay(){
         loadingMap, getMapError, map, getMap,
         addMapPDFStatistic
     } = useMaps()
+    const {
+        SeriesViewEdit, getSeriesViewEdit, isLoadingSeriesViewEdit
+    } = useSeries()
     const {id} = useParams()
 
     const [api, contextHolder] = message.useMessage()
@@ -53,6 +58,13 @@ export function MapPlay(){
     const [newKey, setNewKey] = useState(null)
 
     const [currentAudio, setCurrentAudio] = useState("")
+    
+    const [showForethoughtPhase, setShowForethoughtPhase] = useState(false)
+    const [pendingSeries, setPendingSeries] = useState(null)
+    const [pendingMapElement, setPendingMapElement] = useState(null)
+    const [topicsSubtopics, setTopicsSubtopics] = useState(null)
+    const [preparationResources, setPreparationResources] = useState(null)
+    const [selectedGoals, setSelectedGoals] = useState([])
 
     const initialize = () => {
         getMap(id + "/" + currentPlayerKey)
@@ -64,6 +76,10 @@ export function MapPlay(){
 
         setPlaySeries(false)
         setSelectedPlaySeries(null)
+        setShowForethoughtPhase(false)
+        setPendingSeries(null)
+        setPendingMapElement(null)
+        setTopicsSubtopics(null)
 
         //Get locally stored map-specific key
         const key = getMapKey_LS(id)
@@ -115,9 +131,152 @@ export function MapPlay(){
 
     const playSeriesActivate = (s, e) => {
         notificationApi.destroy()
+        
+        // Check if this is map 31 - show forethought phase first
+        if(String(id) === "31") {
+            setPendingSeries(s)
+            setPendingMapElement(e)
+            // Fetch extended series data to get topics/subtopics
+            if(s && s.Code) {
+                getSeriesViewEdit(s.Code)
+            }
+        } else {
+            // For other maps, proceed directly to quiz
+            setPlaySeries(true)
+            setSelectedPlaySeries(s)
+            setSelectedMapElement(e)
+        }
+    }
+    
+    // Extract topics/subtopics and preparation resources from series data
+    useEffect(() => {
+        if(SeriesViewEdit && String(id) === "31") {
+            const topicsMap = {}
+            const pdfLinksSet = new Set()
+            const videoLinksSet = new Set()
+            
+            if(SeriesViewEdit.Elements) {
+                SeriesViewEdit.Elements.forEach(element => {
+                    // Get question from element (could be ClickableQuestion, KeyboardQuestion, MultipleChoiceQuestion, or Question)
+                    // Note: Extension data is on the base Question property, not on the specific question types
+                    const question = element.Question || 
+                                   element.ClickableQuestion || 
+                                   element.KeyboardQuestion || 
+                                   element.MultipleChoiceQuestion
+                    
+                    if(question) {
+                        // Priority: Use Extension data if available (for CourseMap 31), otherwise use QuestionBase data
+                        let topicName = null
+                        let subtopicName = null
+                        
+                        // Check Extension on the question (Extension comes from QuestionBase)
+                        // Debug: Log Extension data to verify it's present
+                        if(String(id) === "31" && question.Id) {
+                            console.log('Question ID:', question.Id, 'Extension:', question.Extension, 'Extension keys:', question.Extension ? Object.keys(question.Extension) : 'null')
+                        }
+                        
+                        if(question.Extension && question.Extension.Topic) {
+                            // Use extension data (from QuestionMap31Extension table)
+                            topicName = question.Extension.Topic
+                            subtopicName = question.Extension.Sub_Topic || null
+                            
+                            // Collect PDF and video links from extension table
+                            if(question.Extension.Link_Pdf) {
+                                pdfLinksSet.add(question.Extension.Link_Pdf)
+                            }
+                            if(question.Extension.Link_Videos) {
+                                videoLinksSet.add(question.Extension.Link_Videos)
+                            }
+                        } else if(question.Subtopic) {
+                            // Fallback to QuestionBase data
+                            const subtopic = question.Subtopic
+                            const topic = subtopic.Topic
+                            
+                            if(topic && subtopic) {
+                                topicName = topic.Name || topic.Code || 'Unknown Topic'
+                                subtopicName = subtopic.Name || subtopic.Code || 'Unknown Subtopic'
+                            }
+                        }
+                        
+                        if(topicName) {
+                            if(!topicsMap[topicName]) {
+                                topicsMap[topicName] = new Set()
+                            }
+                            if(subtopicName) {
+                                topicsMap[topicName].add(subtopicName)
+                            }
+                        }
+                    }
+                })
+            }
+            
+            // Convert Sets to Arrays
+            const topicsSubtopicsData = Object.keys(topicsMap).map(topicName => ({
+                topic: topicName,
+                subtopics: Array.from(topicsMap[topicName])
+            }))
+            
+            // Prepare resources: Combine map element links with question-specific links (deduplicated)
+            const mapElementPDF = pendingMapElement?.PDFURL
+            const mapElementVideo = pendingMapElement?.VideoURL || pendingMapElement?.ExternalVideoLink
+            
+            const allPDFs = new Set()
+            const allVideos = new Set()
+            
+            // Add map element resources first (if available)
+            if(mapElementPDF) allPDFs.add(mapElementPDF)
+            if(mapElementVideo) allVideos.add(mapElementVideo)
+            
+            // Add question-specific resources (will automatically deduplicate)
+            pdfLinksSet.forEach(url => {
+                if(url && url.trim() !== '') {
+                    allPDFs.add(url)
+                }
+            })
+            videoLinksSet.forEach(url => {
+                if(url && url.trim() !== '') {
+                    allVideos.add(url)
+                }
+            })
+            
+            // Convert to arrays with metadata
+            const resources = {
+                pdfs: Array.from(allPDFs).map(url => ({
+                    url: url,
+                    type: 'pdf',
+                    source: url === mapElementPDF ? 'map' : 'question'
+                })),
+                videos: Array.from(allVideos).map(url => ({
+                    url: url,
+                    type: 'video',
+                    source: url === mapElementVideo ? 'map' : 'question'
+                }))
+            }
+            
+            setTopicsSubtopics(topicsSubtopicsData)
+            setPreparationResources(resources)
+            setShowForethoughtPhase(true)
+        }
+    }, [SeriesViewEdit, id, pendingMapElement])
+    
+    const handleForethoughtComplete = (forethoughtData) => {
+        // Store forethought data if needed (could be saved to localStorage or sent to backend)
+        console.log('Forethought phase completed:', forethoughtData)
+        
+        // Store goals for self-reflection phase
+        if (forethoughtData.goals) {
+            setSelectedGoals(forethoughtData.goals)
+        }
+        
+        // Proceed to quiz
+        setShowForethoughtPhase(false)
         setPlaySeries(true)
-        setSelectedPlaySeries(s)
-        setSelectedMapElement(e)
+        setSelectedPlaySeries(pendingSeries)
+        setSelectedMapElement(pendingMapElement)
+        
+        // Clear pending data
+        setPendingSeries(null)
+        setPendingMapElement(null)
     }   
 
     const renderRequiredElement = (e, requiredElementFull, Threshold) => {
@@ -599,7 +758,7 @@ const setLocalKey = () => {
 
                 {map &&
                 <div>
-                    {!loadingMap && !playSeries && !selectedPlayQuestionnaire && renderMap()}
+                    {!loadingMap && !playSeries && !selectedPlayQuestionnaire && !showForethoughtPhase && renderMap()}
                     {renderActionList()}
                 </div>}
 
@@ -609,11 +768,29 @@ const setLocalKey = () => {
                         onReload={() => initialize()}
                     />
                 }
+                
+                {showForethoughtPhase && pendingMapElement &&
+                    <ForethoughtPhase
+                        onComplete={handleForethoughtComplete}
+                        mapElementName={pendingMapElement.Title}
+                        topicsSubtopics={topicsSubtopics}
+                        isLoadingTopics={isLoadingSeriesViewEdit}
+                        preparationResources={preparationResources}
+                    />
+                }
                     
-                {playSeries && 
+                {playSeries && selectedPlaySeries && 
                     <SeriesPlay 
                         Code={selectedPlaySeries.Code}
-                        onExitSeries = {() => setPlaySeries(false)}
+                        mapId={id}
+                        goals={selectedGoals}
+                        onExitSeries = {() => {
+                            setPlaySeries(false)
+                            setShowForethoughtPhase(false)
+                            setPendingSeries(null)
+                            setPendingMapElement(null)
+                            setSelectedGoals([])
+                        }}
                         onFinishPlaySeries = {(data) => {
                             let _selectedMapElement = ({...selectedMapElement})
 
