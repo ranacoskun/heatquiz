@@ -127,6 +127,7 @@ namespace QuizAPI.Controllers.QuestionsController
                 .ThenInclude(o => o.Owner)
                 .Include(q => q.Choices)
                 .Include(q => q.Information)
+                .Include(q => q.QuestionMap31Extension)
 
                 .FirstOrDefaultAsync(q => q.Id == QuestionId);
 

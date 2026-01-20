@@ -441,6 +441,10 @@ s.Owners.Any(o => o.OwnerId == Owner.Id))
                 .ThenInclude(q => q.Subtopic)
                 .ThenInclude(st => st.Topic)
 
+                .Include(s => s.Elements)
+                .ThenInclude(e => e.Question)
+                .ThenInclude(q => q.QuestionMap31Extension)
+
                 .Include(s => s.MapElements)
                 .ThenInclude(me => me.Map)
                 .ThenInclude(m => m.Course)

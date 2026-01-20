@@ -1161,6 +1161,7 @@ namespace QuizAPI.Controllers.QuestionsController
                 .ThenInclude(cc => cc.Answer)
                 .Include(q => q.Owners)
                 .ThenInclude(o => o.Owner)
+                .Include(q => q.QuestionMap31Extension)
                 .FirstOrDefaultAsync(q => q.Id == QuestionId);
 
             if (Question is null)
@@ -1187,6 +1188,7 @@ namespace QuizAPI.Controllers.QuestionsController
                 .ThenInclude(cc => cc.Answer)
                 .Include(q => q.Owners)
                 .ThenInclude(o => o.Owner)
+                .Include(q => q.QuestionMap31Extension)
                 .FirstOrDefaultAsync(q => q.Id == QuestionId);
 
             if (Question is null)
@@ -1245,6 +1247,7 @@ namespace QuizAPI.Controllers.QuestionsController
                 .Include(q => q.ClickCharts)
                 .ThenInclude(cc => cc.Background_Image)
                 .Include(q => q.Information)
+                .Include(q => q.QuestionMap31Extension)
                 .FirstOrDefaultAsync(q => q.Id == QuestionId);
 
             if (Question is null)

@@ -111,6 +111,7 @@ namespace QuizAPI.Data
         public DbSet<QuestionBase> QuestionBase { get; set; }
         public DbSet<QuestionStatistic> QuestionStatistic { get; set; }
         public DbSet<QuestionPDFStatistic> QuestionPDFStatistic { get; set; }
+        public DbSet<QuestionMap31Extension> QuestionMap31Extension { get; set; }
         
         public DbSet<QuestionCommentSection> QuestionCommentSection { get; set; }
         public DbSet<QuestionComment> QuestionComments { get; set; }
@@ -240,6 +241,12 @@ namespace QuizAPI.Data
             builder.Entity<QuestionBase>()
             .HasOne(a => a.CommentSection).WithOne(b => b.Question)
             .HasForeignKey<QuestionCommentSection>(e => e.QuestionId);
+
+            //QuestionMap31Extension relation (one-to-one with QuestionBase)
+            builder.Entity<QuestionBase>()
+            .HasOne(q => q.QuestionMap31Extension)
+            .WithOne(e => e.Question)
+            .HasForeignKey<QuestionMap31Extension>(e => e.QuestionId);
 
             //Questionnaire series relation
             builder.Entity<QuestionnaireSeriesRelation>()

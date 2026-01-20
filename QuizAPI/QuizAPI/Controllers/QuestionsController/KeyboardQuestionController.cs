@@ -190,6 +190,7 @@ namespace QuizAPI.Controllers.QuestionsController
                 .ThenInclude(vk => vk.VariableKey)
                 .ThenInclude(vk => vk.VariablesChars)
                 .Include(q => q.Information)
+                .Include(q => q.QuestionMap31Extension)
                 .FirstOrDefaultAsync(q => q.Id == QuestionId);
 
 
@@ -218,6 +219,7 @@ namespace QuizAPI.Controllers.QuestionsController
                 .ThenInclude(k => k.VariableKeys)
                 .ThenInclude(vk => vk.VariableKey)
                 .ThenInclude(vk => vk.VariablesChars)
+                .Include(q => q.QuestionMap31Extension)
 
                 .Include(q => q.Keyboard)
                 .ThenInclude(k => k.VariableKeyImages)

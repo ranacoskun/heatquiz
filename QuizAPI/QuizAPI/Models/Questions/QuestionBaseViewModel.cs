@@ -1,6 +1,7 @@
 ﻿using QuizAPI.Models.DefaultValues.LevelsOfDifficulty;
 using QuizAPI.Models.Ownership.ViewModels;
 using QuizAPI.Models.QuestionGroupsSubgroup.ViewModels;
+using QuizAPI.Models.Questions.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -57,6 +58,9 @@ namespace QuizAPI.Models.Questions
         //public string BackgroundImageURL { get; set; }
 
         public List<QuestionStatisticViewModel> QuestionStatistics { get; set; } = new List<QuestionStatisticViewModel>();
+
+        // Extension data for CourseMap 31
+        public QuestionMap31ExtensionViewModel Extension { get; set; }
 
     }
 }

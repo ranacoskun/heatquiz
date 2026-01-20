@@ -22,6 +22,7 @@ using QuizAPI.Models.QuestionGroupsSubgroup;
 using QuizAPI.Models.QuestionGroupsSubgroup.ViewModels;
 using QuizAPI.Models.Questionnaire;
 using QuizAPI.Models.Questions;
+using QuizAPI.Models.Questions.ViewModels;
 using QuizAPI.Models.Questions.DiagramsQuestion;
 using QuizAPI.Models.Questions.DiagramsQuestion.ViewModals;
 using QuizAPI.Models.Questions.EnergyBalanceQuestion;
@@ -118,7 +119,10 @@ namespace QuizAPI.Mapping
                .ForMember(vm => vm.EditedByName, opt => opt.MapFrom(c => c.EditedBy != null ? c.EditedBy.Name :""))
                .ForMember(vm => vm.Base_ImageURL, opt => opt.MapFrom(c => c.Base_ImageURL != null ? $"{FILES_PATH}/{c.Base_ImageURL}" : ""))
                .ForMember(vm => vm.PDFURL, opt => opt.MapFrom(c => c.PDFURL != null ? $"{FILES_PATH}/{c.PDFURL}" : ""))
-               .ForMember(vm => vm.VIDEOURL, opt => opt.MapFrom(c => c.VIDEOURL != null ? $"{FILES_PATH}/{c.VIDEOURL}" : ""));
+               .ForMember(vm => vm.VIDEOURL, opt => opt.MapFrom(c => c.VIDEOURL != null ? $"{FILES_PATH}/{c.VIDEOURL}" : ""))
+               .ForMember(vm => vm.Extension, opt => opt.MapFrom(c => c.QuestionMap31Extension));
+
+            CreateMap<QuestionMap31Extension, QuestionMap31ExtensionViewModel>();
 
             CreateMap<Course, CourseViewModel>()
                 .ForMember(vm => vm.URL, opt => opt.MapFrom(c => c.URL != null ? $"{FILES_PATH}/{c.URL}" : ""))
@@ -199,7 +203,8 @@ namespace QuizAPI.Mapping
                 .ForMember(vm => vm.Base_ImageURL, opt => opt.MapFrom(i => i.Base_ImageURL != null ? $"{FILES_PATH}/{i.Base_ImageURL}" : ""))
                 .ForMember(vm => vm.BackgroundImageURL, opt => opt.MapFrom(i => i.BackgroundImageURL != null ? $"{FILES_PATH}/{i.BackgroundImageURL}" : ""))
                 .ForMember(vm => vm.PDFURL, opt => opt.MapFrom(i => i.PDFURL != null ? $"{FILES_PATH}/{i.PDFURL}" : ""))
-                .ForMember(vm => vm.VIDEOURL, opt => opt.MapFrom(i => i.VIDEOURL != null ? $"{FILES_PATH}/{i.VIDEOURL}" : ""));
+                .ForMember(vm => vm.VIDEOURL, opt => opt.MapFrom(i => i.VIDEOURL != null ? $"{FILES_PATH}/{i.VIDEOURL}" : ""))
+                .ForMember(vm => vm.Extension, opt => opt.MapFrom(c => c.QuestionMap31Extension));
 
             CreateMap<PVDiagramQuestion, PVDiagramQuestionViewModel>()
                 .ForMember(vm => vm.Base_ImageURL, opt => opt.MapFrom(i => i.Base_ImageURL != null ? $"{FILES_PATH}/{i.Base_ImageURL}" : ""))
@@ -272,14 +277,16 @@ namespace QuizAPI.Mapping
                 .ForMember(vm => vm.Base_ImageURL, opt => opt.MapFrom(i => i.ImageURL != null ? $"{FILES_PATH}/{i.ImageURL}" : ""))
                 .ForMember(vm => vm.PDFURL, opt => opt.MapFrom(i => i.PDFURL != null ? $"{FILES_PATH}/{i.PDFURL}" : ""))
                 .ForMember(vm => vm.VIDEOURL, opt => opt.MapFrom(i => i.VIDEOURL != null ? $"{FILES_PATH}/{i.VIDEOURL}" : ""))
-                .ForMember(vm => vm.AnswerForLatex, opt => opt.MapFrom(i => i.AnswerForLatex != null ? $"{FILES_PATH}/{i.AnswerForLatex}" : ""));
+                .ForMember(vm => vm.AnswerForLatex, opt => opt.MapFrom(i => i.AnswerForLatex != null ? $"{FILES_PATH}/{i.AnswerForLatex}" : ""))
+                .ForMember(vm => vm.Extension, opt => opt.MapFrom(c => c.QuestionMap31Extension));
 
             CreateMap<MultipleChoiceQuestion, MultipleChoiceQuestionViewModel>()
                .ForMember(vm => vm.ImageURL, opt => opt.MapFrom(i => i.ImageURL != null ? $"{FILES_PATH}/{i.ImageURL}" : ""))
                .ForMember(vm => vm.Base_ImageURL, opt => opt.MapFrom(i => i.ImageURL != null ? $"{FILES_PATH}/{i.ImageURL}" : ""))
                .ForMember(vm => vm.PDFURL, opt => opt.MapFrom(i => i.PDFURL != null ? $"{FILES_PATH}/{i.PDFURL}" : ""))
                .ForMember(vm => vm.VIDEOURL, opt => opt.MapFrom(i => i.VIDEOURL != null ? $"{FILES_PATH}/{i.VIDEOURL}" : ""))
-               .ForMember(vm => vm.AnswerForLatex, opt => opt.MapFrom(i => i.AnswerForLatex != null ? $"{FILES_PATH}/{i.AnswerForLatex}" : ""));
+               .ForMember(vm => vm.AnswerForLatex, opt => opt.MapFrom(i => i.AnswerForLatex != null ? $"{FILES_PATH}/{i.AnswerForLatex}" : ""))
+               .ForMember(vm => vm.Extension, opt => opt.MapFrom(c => c.QuestionMap31Extension));
 
 
 

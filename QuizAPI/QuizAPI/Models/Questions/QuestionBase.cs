@@ -69,5 +69,8 @@ namespace QuizAPI.Models.Questions
         public List<QuestionPDFStatistic> QuestionPDFStatistics { get; set; } = new List<QuestionPDFStatistic>();
         public List<FeedbackQuestion> StudentFeedback { get; set; } = new List<FeedbackQuestion>();
         public List<FeedbackQuestionEvent> StudentFeedbackEvents { get; set; } = new List<FeedbackQuestionEvent>();
+
+        // Extension data for CourseMap 31
+        public QuestionMap31Extension QuestionMap31Extension { get; set; }
     }
 }
