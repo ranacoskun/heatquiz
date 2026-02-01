@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Form, Input, Space, Typography, Spin, Tag, Divider, Row, Col, Checkbox, Progress, Tooltip } from "antd";
-import { RocketOutlined, CheckCircleOutlined, BookOutlined, FilePdfOutlined, PlayCircleOutlined, LinkOutlined, ReadOutlined, CheckOutlined, BulbOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Space, Typography, Spin, Tag, Divider, Row, Col, Checkbox, Tooltip } from "antd";
+import { RocketOutlined, CheckCircleOutlined, BookOutlined, FilePdfOutlined, PlayCircleOutlined, LinkOutlined, ReadOutlined, CheckOutlined, BulbOutlined } from '@ant-design/icons';
 import { pdfjs } from 'react-pdf';
 import { getPdfTitle, getVideoTitle } from "../../../../services/ResourceTitles";
 
@@ -184,7 +184,6 @@ const VideoThumbnail = ({ url }) => {
 export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, isLoadingTopics, preparationResources }) {
     const [form] = Form.useForm();
     const [selectedGoals, setSelectedGoals] = useState([]);
-    const [showOptionalSections, setShowOptionalSections] = useState(false);
 
     // Get the topic to use in goals - use mapElementName (quiz title) as the topic
     const quizTopic = mapElementName || 'this quiz';
@@ -203,17 +202,6 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
         setSelectedGoals(checkedValues);
     };
 
-    // Calculate completion progress for visual feedback
-    const calculateProgress = () => {
-        let progress = 0;
-        
-        if (topicsSubtopics && topicsSubtopics.length > 0) progress += 33;
-        if (selectedGoals.length > 0) progress += 33;
-        if (showOptionalSections) progress += 34;
-        
-        return progress;
-    };
-
     const handleSubmit = () => {
         const formValues = form.getFieldsValue();
         // Map selected goal indices to actual goal text
@@ -224,8 +212,8 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
         }
         onComplete({
             goals: goals,
-            expectations: formValues.expectations || '',
-            strategies: formValues.strategies || ''
+            expectations: '',
+            strategies: ''
         });
     };
 
@@ -249,7 +237,7 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                 bodyStyle={{ padding: '20px' }}
             >
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                    {/* Header with Progress Indicator */}
+                    {/* Header */}
                     <div style={{ textAlign: 'center', marginBottom: '12px' }}>
                         <div style={{ 
                             display: 'inline-flex', 
@@ -271,13 +259,6 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                 {mapElementName}
                             </Text>
                         )}
-                        <Progress 
-                            percent={calculateProgress()} 
-                            showInfo={false} 
-                            strokeColor="#52c41a"
-                            style={{ maxWidth: '200px', margin: '0 auto' }}
-                            size="small"
-                        />
                         <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginTop: '4px' }}>
                             Quick setup • Takes less than 2 minutes
                         </Text>
@@ -322,7 +303,7 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                     marginBottom: '10px',
                                     display: 'block'
                                 }}>
-                                    Topics you should know:
+                                    Topics you should already know:
                                 </Text>
 
                                 {isLoadingTopics ? (
@@ -542,65 +523,6 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                     />
                                 </Form.Item>
                             </div>
-                        </div>
-
-                        {/* Optional Sections - Collapsible */}
-                        <div style={{
-                            padding: '12px',
-                            backgroundColor: '#fafafa',
-                            borderRadius: '6px',
-                            border: '1px solid #e8e8e8'
-                        }}>
-                            <div 
-                                style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'space-between',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => setShowOptionalSections(!showOptionalSections)}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <ThunderboltOutlined style={{ marginRight: '8px', color: '#faad14', fontSize: '14px' }} />
-                                    <Text strong style={{ fontSize: '13px' }}>
-                                        Additional Preparation (Optional)
-                                    </Text>
-                                    <Tag color="default" style={{ marginLeft: '8px', fontSize: '11px' }}>
-                                        Optional
-                                    </Tag>
-                                </div>
-                                <Text type="secondary" style={{ fontSize: '11px' }}>
-                                    {showOptionalSections ? 'Hide' : 'Show'}
-                                </Text>
-                            </div>
-
-                            {showOptionalSections && (
-                                <div style={{ marginTop: '12px' }}>
-                                    <Form.Item 
-                                        name="expectations"
-                                        label={<Text style={{ fontSize: '12px' }}>What do you expect to learn?</Text>}
-                                        style={{ marginBottom: '10px' }}
-                                    >
-                                        <TextArea
-                                            rows={2}
-                                            placeholder="e.g., I expect to understand the relationship between temperature and pressure"
-                                            size="middle"
-                                        />
-                                    </Form.Item>
-
-                                    <Form.Item 
-                                        name="strategies"
-                                        label={<Text style={{ fontSize: '12px' }}>Your strategy for this quiz</Text>}
-                                        style={{ marginBottom: 0 }}
-                                    >
-                                        <TextArea
-                                            rows={2}
-                                            placeholder="e.g., I'll read each question twice and check my calculations"
-                                            size="middle"
-                                        />
-                                    </Form.Item>
-                                </div>
-                            )}
                         </div>
 
                         <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>

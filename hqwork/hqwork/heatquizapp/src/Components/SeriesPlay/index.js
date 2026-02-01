@@ -860,10 +860,13 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
                         correctCount={correctCount}
                         playedElements={playedElements}
                         goals={goals || []}
+                        seriesStatistics={SeriesStatistics}
+                        seriesElements={seriesElements}
                     />
                 )}
-                <Row>
-                {seriesElements.map((e, ei) => {
+                {!isMap31 && (
+                    <Row>
+                    {seriesElements.map((e, ei) => {
                      const {Question} = e
                      const {Code, Type, PDFURL} = Question
  
@@ -1023,7 +1026,8 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
                         </Col>
                     )
                 })}
-                </Row>
+                    </Row>
+                )}
             </div>
         )
     }

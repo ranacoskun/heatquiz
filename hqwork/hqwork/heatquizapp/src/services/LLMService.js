@@ -148,13 +148,13 @@ const buildPerformancePrompt = (performanceData) => {
     prompt += `\n`;
   }
 
-  prompt += `Please provide a brief, encouraging motivational message (1-2 short paragraphs, maximum 150 words) that:\n`;
-  prompt += `1. Acknowledges their effort and overall performance\n`;
+  prompt += `Please provide a brief, encouraging motivational message (1-2 short paragraphs, maximum 150 words) using "you" language that:\n`;
+  prompt += `1. Acknowledges your effort and overall performance\n`;
   prompt += `2. Provides general encouragement to continue learning\n`;
   prompt += `IMPORTANT: Do NOT provide specific learning advice, topic analysis, or study recommendations. `;
   prompt += `Only provide general motivation and encouragement. `;
   prompt += `Keep it brief, positive, and supportive. `;
-  prompt += `Do not make claims about what they should study or how they should improve - that information is already provided in the factual data above.`;
+  prompt += `Do not make claims about what you should study or how you should improve - that information is already provided in the factual data above.`;
 
   return prompt;
 };
@@ -218,7 +218,7 @@ export const generateGoalJudgments = async (goals, performanceData) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an educational assistant that evaluates learning goals based on quiz performance data. For each goal, determine if it was "met", "partially met", or "not yet met", and provide a one-line explanation grounded in the performance data.'
+            content: 'You are an educational assistant that evaluates learning goals based on quiz performance data. For each goal, provide an explanation grounded in the performance data using "you" language. Format it as: [brief factual performance data]|||[self-reflective question]. Start with a brief, concise factual statement (e.g., "You scored X% on questions related to Y" - keep it short, just the essential data), then use "|||" as a separator, then provide a short, clear, and engaging self-reflective question (1 sentence maximum) that captures attention and prompts the student to think about what this performance means for their understanding. The question should be concise, thought-provoking, and based on all the performance data provided.'
           },
           {
             role: 'user',
@@ -282,7 +282,7 @@ export const generateLearningPatternAnalysis = async (performanceData) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an educational assistant that analyzes learning patterns based on quiz performance. Provide a short paragraph (2-3 sentences) explaining where and how the learner struggled, based on question type, difficulty, and mistakes.'
+            content: 'You are an educational assistant that analyzes learning patterns based on quiz performance. Provide a short paragraph (2-3 sentences) using "you" language explaining where and how you struggled, based on question type, difficulty, and mistakes.'
           },
           {
             role: 'user',
@@ -333,12 +333,12 @@ const buildGoalJudgmentPrompt = (goals, performanceData) => {
     mistakes
   } = performanceData;
 
-  let prompt = `Evaluate each learning goal based on the student's quiz performance. For each goal, respond with exactly one line in this format:\n`;
+  let prompt = `Evaluate each learning goal based on your quiz performance. For each goal, respond with exactly one line in this format:\n`;
   prompt += `GOAL: [goal text]\n`;
   prompt += `STATUS: [met/partially met/not yet met]\n`;
-  prompt += `EXPLANATION: [one-line explanation grounded in performance data]\n\n`;
+  prompt += `EXPLANATION: [Start with a brief, concise factual performance statement using "you" language (e.g., "You scored X% on questions related to Y" - keep it short, just the essential data), then add "|||" as a separator, then provide a short, clear, engaging self-reflective question (1 sentence maximum) that captures attention and prompts thinking about what this means for understanding, based on all the performance data provided]\n\n`;
 
-  prompt += `Performance Data:\n`;
+  prompt += `Your Performance Data:\n`;
   prompt += `- Overall: ${correctCount}/${totalQuestions} correct (${overallSuccessRate}%)\n\n`;
 
   if (questionTypes && Object.keys(questionTypes).length > 0) {
@@ -398,9 +398,9 @@ const buildLearningPatternPrompt = (performanceData) => {
     mistakes
   } = performanceData;
 
-  let prompt = `Analyze the student's learning patterns based on their quiz performance. Provide a short paragraph (2-3 sentences) explaining where and how they struggled.\n\n`;
+  let prompt = `Analyze your learning patterns based on your quiz performance. Provide a short paragraph (2-3 sentences) using "you" language explaining where and how you struggled.\n\n`;
 
-  prompt += `Performance Summary:\n`;
+  prompt += `Your Performance Summary:\n`;
   prompt += `- Overall: ${correctCount}/${totalQuestions} correct (${overallSuccessRate}%)\n\n`;
 
   if (questionTypes && Object.keys(questionTypes).length > 0) {
@@ -435,10 +435,10 @@ const buildLearningPatternPrompt = (performanceData) => {
   }
 
   prompt += `Provide a concise analysis focusing on:\n`;
-  prompt += `1. Which question types or difficulty levels were challenging\n`;
-  prompt += `2. What patterns emerge from the mistakes\n`;
-  prompt += `3. What this suggests about the learner's understanding\n`;
-  prompt += `Keep it to 2-3 sentences, very short and simple.`;
+  prompt += `1. Which question types or difficulty levels were challenging for you\n`;
+  prompt += `2. What patterns emerge from your mistakes\n`;
+  prompt += `3. What this suggests about your understanding\n`;
+  prompt += `Use "you" language. Keep it to 2-3 sentences, very short and simple.`;
 
   return prompt;
 };

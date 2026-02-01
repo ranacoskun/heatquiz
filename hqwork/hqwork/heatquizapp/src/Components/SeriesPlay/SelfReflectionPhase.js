@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Card, Space, Typography, Progress, Spin, Alert, Button, Row, Col, Tag, Divider, Checkbox } from "antd";
-import { CheckCircleOutlined, TrophyOutlined, BulbOutlined, ReloadOutlined, RobotOutlined, FilePdfOutlined, PlayCircleOutlined, ExclamationCircleOutlined, AimOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Card, Space, Typography, Progress, Spin, Alert, Button, Row, Col, Tag, Divider } from "antd";
+import { CheckCircleOutlined, TrophyOutlined, BulbOutlined, ReloadOutlined, RobotOutlined, FilePdfOutlined, PlayCircleOutlined, ExclamationCircleOutlined, AimOutlined, CloseCircleOutlined, StarFilled, ClockCircleOutlined, AreaChartOutlined } from '@ant-design/icons';
 import { generateGoalJudgments, generateGoalJudgmentsViaBackend, generateLearningPatternAnalysis, generateLearningPatternAnalysisViaBackend } from "../../services/LLMService";
 import { getPdfTitle, getVideoTitle } from "../../services/ResourceTitles";
+import { LatexRenderer } from "../LatexRenderer";
+import { DisplayClickableQuestionAnswers } from "./DisplayClickableQuestionAnswers";
+import { ViewSolutionComponent } from "../ViewSolutionComponent";
+import { CLICKABLE_QUESTION_PARAMETER, DIAGRAM_QUESTION_PARAMETER, ENERGY_BALANCE_QUESTION_PARAMETER, FBD_QUESTION_PARAMETER, KEYBOARD_QUESTION_PARAMETER, MULTIPLE_CHOICE_QUESTION_PARAMETER, PV_DIAGRAM_QUESTION_PARAMETER } from "../../Pages/Questions/List/constants";
 
 const { Title, Text, Paragraph } = Typography;
 
-export function SelfReflectionPhase({ totalQuestions, correctCount, playedElements, goals = [] }) {
-    const [incorrectAnswersData, setIncorrectAnswersData] = useState(null);
+export function SelfReflectionPhase({ totalQuestions, correctCount, playedElements, goals = [], seriesStatistics, seriesElements = [] }) {
     const [goalJudgments, setGoalJudgments] = useState([]);
     const [learningPatternAnalysis, setLearningPatternAnalysis] = useState(null);
     const [loadingSelfReflection, setLoadingSelfReflection] = useState(false);
@@ -46,144 +49,6 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
     };
 
     const assessment = getAssessment();
-
-    // Extract incorrect answers data for review section
-    const extractIncorrectAnswersData = () => {
-        if (!playedElements || playedElements.length === 0) {
-            return null;
-        }
-
-        const incorrectTopicsMap = {}; // { topicName: { subtopics: Set, pdfs: Set, videos: Set, count: number } }
-        const incorrectQuestions = []; // Store full question objects for reference
-
-        console.log('SelfReflection - extractIncorrectAnswersData called with', playedElements.length, 'playedElements');
-        console.log('SelfReflection - Full playedElements array:', playedElements);
-
-        playedElements.forEach((element, index) => {
-            const { Question, Correct } = element;
-
-            // Debug: Log the element structure
-            console.log(`SelfReflection - Element ${index + 1}:`, {
-                hasQuestion: !!Question,
-                QuestionId: Question?.Id,
-                Correct: Correct,
-                CorrectType: typeof Correct,
-                CorrectValue: Correct,
-                FullElement: element
-            });
-
-            // Only process incorrect answers
-            // Handle both boolean and string "true"/"false" cases
-            const isCorrect = Correct === true || Correct === "true" || Correct === 1;
-            
-            if (!Question || isCorrect) {
-                if (Question && isCorrect) {
-                    console.log(`SelfReflection - Skipping correct answer for Question ID: ${Question.Id} (Correct=${Correct})`);
-                } else if (!Question) {
-                    console.log(`SelfReflection - Skipping element ${index + 1} - No Question object`);
-                }
-                return;
-            }
-
-            // Debug: Log full Question object structure
-            console.log(`SelfReflection - Processing incorrect answer ${index + 1}:`, {
-                QuestionId: Question.Id,
-                QuestionCode: Question.Code,
-                HasExtension: !!Question.Extension,
-                Extension: Question.Extension,
-                ExtensionKeys: Question.Extension ? Object.keys(Question.Extension) : [],
-                HasSubtopic: !!Question.Subtopic,
-                Subtopic: Question.Subtopic
-            });
-
-            // Extract topic/subtopic (using Extension data if available)
-            let topicName = null;
-            let subtopicName = null;
-            let pdfLink = null;
-            let videoLink = null;
-
-            // Check Extension data (handle both PascalCase and camelCase property names)
-            if (Question.Extension) {
-                const ext = Question.Extension;
-                // Try both PascalCase and camelCase property names
-                topicName = ext.Topic || ext.topic || null;
-                subtopicName = ext.Sub_Topic || ext.sub_Topic || ext.SubTopic || ext.subTopic || null;
-                pdfLink = ext.Link_Pdf || ext.link_Pdf || ext.LinkPdf || ext.linkPdf || null;
-                videoLink = ext.Link_Videos || ext.link_Videos || ext.LinkVideos || ext.linkVideos || null;
-
-                console.log(`SelfReflection - Extension data for Q${Question.Id}:`, {
-                    topicName,
-                    subtopicName,
-                    pdfLink,
-                    videoLink
-                });
-            }
-
-            // Fallback to QuestionBase data if Extension doesn't have topic
-            if (!topicName && Question.Subtopic) {
-                const subtopic = Question.Subtopic;
-                const topic = subtopic.Topic || subtopic.topic;
-                topicName = topic?.Name || topic?.name || topic?.Code || topic?.code || 'Unknown Topic';
-                subtopicName = subtopic?.Name || subtopic?.name || subtopic?.Code || subtopic?.code || 'Unknown Subtopic';
-                console.log(`SelfReflection - Using QuestionBase data for Q${Question.Id}:`, { topicName, subtopicName });
-            }
-
-            if (topicName) {
-                // Initialize topic if not exists
-                if (!incorrectTopicsMap[topicName]) {
-                    incorrectTopicsMap[topicName] = {
-                        subtopics: new Set(),
-                        pdfs: new Set(),
-                        videos: new Set(),
-                        count: 0
-                    };
-                }
-
-                // Add subtopic
-                if (subtopicName) {
-                    incorrectTopicsMap[topicName].subtopics.add(subtopicName);
-                }
-
-                // Add PDF/video links from extension
-                if (pdfLink && pdfLink.trim() !== '') {
-                    incorrectTopicsMap[topicName].pdfs.add(pdfLink);
-                }
-                if (videoLink && videoLink.trim() !== '') {
-                    incorrectTopicsMap[topicName].videos.add(videoLink);
-                }
-
-                // Increment count
-                incorrectTopicsMap[topicName].count++;
-                incorrectQuestions.push(Question);
-            } else {
-                console.warn(`SelfReflection - No topic found for incorrect Question ID: ${Question.Id}`);
-            }
-        });
-
-        console.log('SelfReflection - Final incorrectTopicsMap:', incorrectTopicsMap);
-
-        // Convert to display format
-            const topics = Object.keys(incorrectTopicsMap).map(topicName => ({
-                topic: topicName,
-                subtopics: Array.from(incorrectTopicsMap[topicName].subtopics),
-                pdfs: Array.from(incorrectTopicsMap[topicName].pdfs).map(url => ({
-                    url: url,
-                    type: 'pdf',
-                    title: getPdfTitle(url, 'PDF')
-                })),
-                videos: Array.from(incorrectTopicsMap[topicName].videos).map(url => ({
-                    url: url,
-                    type: 'video',
-                    title: getVideoTitle(url, 'Video')
-                })),
-                incorrectCount: incorrectTopicsMap[topicName].count
-            }));
-
-        return {
-            topics: topics,
-            totalIncorrect: incorrectQuestions.length
-        };
-    };
 
     // Extract performance data from playedElements
     const extractPerformanceData = () => {
@@ -339,14 +204,6 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
         }
     };
 
-    // Extract incorrect answers data when playedElements changes
-    useEffect(() => {
-        if (playedElements && playedElements.length > 0) {
-            const incorrectData = extractIncorrectAnswersData();
-            setIncorrectAnswersData(incorrectData);
-        }
-    }, [playedElements]);
-
     // Auto-generate self-reflection when goals and playedElements are available
     useEffect(() => {
         if (goals && goals.length > 0 && playedElements && playedElements.length > 0 && !loadingSelfReflection && goalJudgments.length === 0) {
@@ -355,25 +212,6 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
     }, [goals, playedElements]);
 
     // Don't auto-generate - let user choose to use it
-
-    // Get status badge color
-    const getStatusColor = (status) => {
-        if (status === 'met') return '#52c41a';
-        if (status === 'partially met') return '#faad14';
-        return '#ff4d4f';
-    };
-
-    // Get status badge text
-    const getStatusText = (status) => {
-        if (status === 'met') return 'Met';
-        if (status === 'partially met') return 'Partially Met';
-        return 'Not Yet';
-    };
-
-    // Filter goals by status
-    const metGoals = goalJudgments.filter(g => g.status === 'met');
-    const partiallyMetGoals = goalJudgments.filter(g => g.status === 'partially met');
-    const notMetGoals = goalJudgments.filter(g => g.status === 'not yet met');
 
     return (
         <Card
@@ -384,21 +222,48 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                 borderTop: `4px solid ${assessment.color}`
             }}
         >
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                {/* Self-Reflection Section - At the Top */}
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                {/* Overall Performance Summary - Compact at Top */}
+                <div style={{ textAlign: 'center', paddingBottom: '12px', borderBottom: '1px solid #f0f0f0' }}>
+                    <Title level={3} style={{ marginBottom: '12px' }}>Your Performance</Title>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                        <div style={{ fontSize: '32px', color: assessment.color }}>
+                            {assessment.icon}
+                        </div>
+                        <div>
+                            <Text strong style={{ fontSize: '18px', color: assessment.color }}>
+                                {correctCount}/{totalQuestions} ({percentage}%)
+                            </Text>
+                            <div style={{ marginTop: '4px' }}>
+                                <Progress 
+                                    percent={percentage} 
+                                    strokeColor={assessment.color}
+                                    format={() => `${percentage}%`}
+                                    style={{ width: '120px' }}
+                                    size="small"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <Text style={{ fontSize: '13px', color: assessment.color, marginTop: '8px', display: 'block' }}>
+                        {assessment.message}
+                    </Text>
+                </div>
+
+                {/* Self-Reflection Section */}
                 <div>
-                    <Title level={3} style={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
+                    <Title level={3} style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', marginTop: '8px' }}>
                         <AimOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
-                        Self Reflection
+                        Reflect on Your Performance
                     </Title>
 
                     {/* Goal Progress Section */}
                     {goals && goals.length > 0 && (
-                        <div style={{ marginBottom: '24px' }}>
-                            <Title level={4} style={{ marginBottom: '12px' }}>Goal Progress</Title>
+                        <div style={{ marginBottom: '16px' }}>
+                            <Title level={4} style={{ marginBottom: '8px' }}>Goal Progress</Title>
                             
                             {loadingSelfReflection && (
-                                <Card style={{ marginBottom: '16px' }}>
+                                <Card style={{ marginBottom: '12px' }}>
                                     <Space>
                                         <Spin />
                                         <Text>Analyzing your goals...</Text>
@@ -422,33 +287,49 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                                     }
                                     closable
                                     onClose={() => setSelfReflectionError(null)}
-                                    style={{ marginBottom: '16px' }}
+                                    style={{ marginBottom: '12px' }}
                                 />
                             )}
 
                             {goalJudgments.length > 0 && !loadingSelfReflection && (
-                                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                                    <Text type="secondary" style={{ fontSize: '11px', fontStyle: 'italic', marginBottom: '4px' }}>
+                                        <RobotOutlined style={{ marginRight: '4px' }} />
+                                        AI-generated reflection questions
+                                    </Text>
                                     {goalJudgments.map((judgment, index) => (
                                         <Card 
                                             key={index}
+                                            size="small"
                                             style={{ 
-                                                borderLeft: `3px solid ${getStatusColor(judgment.status)}`,
-                                                backgroundColor: judgment.status === 'met' ? '#f6ffed' : 
-                                                               judgment.status === 'partially met' ? '#fffbe6' : '#fff1f0'
+                                                borderLeft: '3px solid #1890ff'
                                             }}
                                         >
                                             <Space align="start" style={{ width: '100%' }}>
-                                                <Checkbox checked={judgment.status === 'met'} disabled />
                                                 <div style={{ flex: 1 }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap' }}>
-                                                        <Text strong style={{ marginRight: '8px' }}>{judgment.goal}</Text>
-                                                        <Tag color={getStatusColor(judgment.status)}>
-                                                            {getStatusText(judgment.status)}
-                                                        </Tag>
-                                                    </div>
-                                                    <Text type="secondary" style={{ fontSize: '13px' }}>
-                                                        {judgment.explanation}
+                                                    <Text strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>
+                                                        {judgment.goal}
                                                     </Text>
+                                                    {(() => {
+                                                        const parts = judgment.explanation.split('|||');
+                                                        const factualPart = parts[0]?.trim() || '';
+                                                        const questionPart = parts[1]?.trim() || '';
+                                                        
+                                                        return (
+                                                            <div>
+                                                                <Text type="secondary" style={{ fontSize: '12px' }}>
+                                                                    {factualPart}
+                                                                </Text>
+                                                                {questionPart && (
+                                                                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
+                                                                        <Text strong style={{ fontSize: '12px', color: '#1890ff', display: 'block' }}>
+                                                                            {questionPart}
+                                                                        </Text>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </Space>
                                         </Card>
@@ -459,14 +340,14 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                     )}
 
                     {/* Learning Pattern Analysis Section */}
-                    <div style={{ marginBottom: '24px' }}>
-                        <Title level={4} style={{ marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ marginBottom: '16px' }}>
+                        <Title level={4} style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
                             <BulbOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
                             Learning Pattern Analysis
                         </Title>
                         
                         {loadingSelfReflection && !learningPatternAnalysis && (
-                            <Card>
+                            <Card size="small">
                                 <Space>
                                     <Spin />
                                     <Text>Analyzing your learning patterns...</Text>
@@ -476,12 +357,13 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
 
                         {learningPatternAnalysis && !loadingSelfReflection && (
                             <Card 
+                                size="small"
                                 style={{ 
                                     backgroundColor: '#f0f7ff',
                                     borderLeft: '3px solid #1890ff'
                                 }}
                             >
-                                <Paragraph style={{ marginBottom: 0, fontSize: '14px', lineHeight: '1.6' }}>
+                                <Paragraph style={{ marginBottom: 0, fontSize: '13px', lineHeight: '1.5' }}>
                                     {learningPatternAnalysis}
                                 </Paragraph>
                             </Card>
@@ -489,229 +371,310 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                     </div>
                 </div>
 
-                <Divider />
+                <Divider style={{ margin: '12px 0' }} />
 
-                {/* Mistakes Section */}
-                {incorrectAnswersData && incorrectAnswersData.topics.length > 0 && (
-                    <div style={{ marginBottom: '24px' }}>
-                        <Title level={4} style={{ marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
-                            <CloseCircleOutlined style={{ marginRight: '8px', color: '#ff4d4f' }} />
-                            Mistakes
-                        </Title>
-                        <Paragraph type="secondary" style={{ marginBottom: '12px', fontSize: '13px' }}>
-                            You answered <Text strong style={{ color: '#ff4d4f' }}>{incorrectAnswersData.totalIncorrect}</Text> question(s) incorrectly. 
-                            Review these topics and resources to improve your understanding.
-                        </Paragraph>
+                {/* Question Recap Section */}
+                {playedElements && playedElements.length > 0 && (
+                    <div>
+                        <Title level={3} style={{ marginBottom: '12px', marginTop: '8px' }}>Question Recap</Title>
+                        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                            {playedElements.map((element, index) => {
+                                const { Question, Correct, Score, Time, Answers } = element;
+                                const isCorrect = Correct === true || Correct === "true" || Correct === 1;
+                                
+                                // Get stats from seriesStatistics
+                                let questionStats = null;
+                                if (seriesStatistics && seriesStatistics.ElementStats && seriesElements[index]) {
+                                    const elementId = seriesElements[index].Id;
+                                    questionStats = seriesStatistics.ElementStats.find(stat => stat.Id === elementId);
+                                }
 
-                        <Row gutter={[12, 12]}>
-                            {incorrectAnswersData.topics.map((topicData, index) => (
-                                <Col xs={24} sm={12} key={index}>
-                                    <Card 
+                                // Calculate stats
+                                const xp = Math.trunc(parseFloat(Score) * 10);
+                                const timeTaken = Math.ceil(Time / 1000); // Convert to seconds
+                                const successRate = questionStats ? Math.round((questionStats.TotalSuccessPlay / (questionStats.TotalPlay + 1)) * 100) : 0;
+                                const medianTime = questionStats ? questionStats.MedianPlayTime : 0;
+
+                                // Extract topic and subtopic
+                                let topicName = null;
+                                let subtopicName = null;
+                                let pdfLink = null;
+                                let videoLink = null;
+
+                                if (Question.Extension) {
+                                    topicName = Question.Extension.Topic || Question.Extension.topic || null;
+                                    subtopicName = Question.Extension.Sub_Topic || Question.Extension.sub_Topic || Question.Extension.SubTopic || Question.Extension.subTopic || null;
+                                    pdfLink = Question.Extension.Link_Pdf || Question.Extension.link_Pdf || Question.Extension.LinkPdf || Question.Extension.linkPdf || null;
+                                    videoLink = Question.Extension.Link_Videos || Question.Extension.link_Videos || Question.Extension.LinkVideos || Question.Extension.linkVideos || null;
+                                }
+
+                                if (!topicName && Question.Subtopic) {
+                                    const subtopic = Question.Subtopic;
+                                    const topic = subtopic.Topic || subtopic.topic;
+                                    topicName = topic?.Name || topic?.name || topic?.Code || topic?.code || 'Unknown Topic';
+                                    subtopicName = subtopic?.Name || subtopic?.name || subtopic?.Code || subtopic?.code || 'Unknown Subtopic';
+                                }
+
+                                // Render question preview based on type
+                                const renderQuestionPreview = () => {
+                                    const { Type } = Question;
+                                    
+                                    if (Type === KEYBOARD_QUESTION_PARAMETER) {
+                                        return renderKeyboardQuestionPreview(element, index);
+                                    } else if (Type === CLICKABLE_QUESTION_PARAMETER) {
+                                        return renderClickableQuestionPreview(element, index);
+                                    } else if (Type === MULTIPLE_CHOICE_QUESTION_PARAMETER) {
+                                        return renderMultipleChoiceQuestionPreview(element, index);
+                                    } else if (Type === ENERGY_BALANCE_QUESTION_PARAMETER || 
+                                               Type === DIAGRAM_QUESTION_PARAMETER || 
+                                               Type === FBD_QUESTION_PARAMETER || 
+                                               Type === PV_DIAGRAM_QUESTION_PARAMETER) {
+                                        return renderImageBasedQuestionPreview(element, index);
+                                    }
+                                    return null;
+                                };
+
+                                return (
+                                    <Card
+                                        key={index}
                                         size="small"
-                                        style={{ 
-                                            borderLeft: '3px solid #ff4d4f',
-                                            backgroundColor: '#fff1f0',
-                                            height: '100%'
+                                        style={{
+                                            borderLeft: `3px solid ${isCorrect ? '#52c41a' : '#ff4d4f'}`
                                         }}
                                     >
                                         <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                            {/* Topic header with count */}
+                                            {/* Header with question number and status */}
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                                <Title level={5} style={{ margin: 0, color: '#ff4d4f', fontSize: '14px' }}>
-                                                    {topicData.topic}
-                                                </Title>
-                                                <Tag color="red" style={{ fontSize: '11px', margin: 0 }}>
-                                                    {topicData.incorrectCount} incorrect
-                                                </Tag>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <Text strong style={{ fontSize: '14px' }}>
+                                                        {index + 1}. {Question.Code || `Question ${index + 1}`}
+                                                    </Text>
+                                                    {isCorrect ? (
+                                                        <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
+                                                    ) : (
+                                                        <CloseCircleOutlined style={{ color: '#ff4d4f', fontSize: '16px' }} />
+                                                    )}
+                                                </div>
+                                                {(topicName || subtopicName) && (
+                                                    <Space wrap size={[4, 4]}>
+                                                        {topicName && <Tag style={{ fontSize: '11px' }}>{topicName}</Tag>}
+                                                        {subtopicName && <Tag color="blue" style={{ fontSize: '11px' }}>{subtopicName}</Tag>}
+                                                    </Space>
+                                                )}
                                             </div>
 
-                                            {/* Subtopics */}
-                                            {topicData.subtopics.length > 0 && (
-                                                <div style={{ marginTop: '4px' }}>
-                                                    <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>
-                                                        Subtopics:
-                                                    </Text>
-                                                    <Space wrap size={[4, 4]}>
-                                                        {topicData.subtopics.map((subtopic, subIndex) => (
-                                                            <Tag key={subIndex} color="orange" style={{ fontSize: '11px', margin: 0 }}>
-                                                                {subtopic}
-                                                            </Tag>
-                                                        ))}
+                                            {/* Question Preview */}
+                                            <div style={{ marginTop: '6px' }}>
+                                                {renderQuestionPreview()}
+                                            </div>
+
+                                            {/* Stats */}
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '6px' }}>
+                                                <Space size="small">
+                                                    <StarFilled style={{ color: '#faad14' }} />
+                                                    <Text>{xp} XP</Text>
+                                                </Space>
+                                                <Space size="small">
+                                                    <ClockCircleOutlined />
+                                                    <Text>{timeTaken}s</Text>
+                                                </Space>
+                                                {successRate > 0 && (
+                                                    <Space size="small">
+                                                        <AreaChartOutlined style={{ color: '#52c41a' }} />
+                                                        <Text>{successRate}%</Text>
+                                                    </Space>
+                                                )}
+                                                {medianTime > 0 && (
+                                                    <Space size="small">
+                                                        <ClockCircleOutlined style={{ color: '#1890ff' }} />
+                                                        <Text type="secondary">Median: {medianTime}s</Text>
+                                                    </Space>
+                                                )}
+                                            </div>
+
+                                            {/* Solution and Review Materials (only for incorrect) */}
+                                            {!isCorrect && (
+                                                <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
+                                                    <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                                                        {Question.PDFURL && (
+                                                            <ViewSolutionComponent 
+                                                                question={Question}
+                                                                correct={false}
+                                                            />
+                                                        )}
+                                                        
+                                                        {(pdfLink || videoLink) && (
+                                                            <div>
+                                                                <Text strong style={{ fontSize: '11px', display: 'block', marginBottom: '4px' }}>
+                                                                    Review Materials:
+                                                                </Text>
+                                                                <Space wrap size={[6, 6]}>
+                                                                    {pdfLink && (
+                                                                        <Button
+                                                                            size="small"
+                                                                            icon={<FilePdfOutlined />}
+                                                                            onClick={() => window.open(pdfLink, '_blank', 'noopener,noreferrer')}
+                                                                        >
+                                                                            {getPdfTitle(pdfLink, 'PDF')}
+                                                                        </Button>
+                                                                    )}
+                                                                    {videoLink && (
+                                                                        <Button
+                                                                            size="small"
+                                                                            icon={<PlayCircleOutlined />}
+                                                                            onClick={() => window.open(videoLink, '_blank', 'noopener,noreferrer')}
+                                                                        >
+                                                                            {getVideoTitle(videoLink, 'Video')}
+                                                                        </Button>
+                                                                    )}
+                                                                </Space>
+                                                            </div>
+                                                        )}
                                                     </Space>
                                                 </div>
                                             )}
-
-                                            {/* PDF and Video Resources */}
-                                            {(topicData.pdfs.length > 0 || topicData.videos.length > 0) && (
-                                                <div style={{ marginTop: '8px' }}>
-                                                    <Text strong style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>
-                                                        Resources:
-                                                    </Text>
-                                                    <Row gutter={[4, 4]}>
-                                                        {/* PDF Cards */}
-                                                        {topicData.pdfs.map((pdf, pdfIndex) => (
-                                                            <Col xs={24} sm={12} key={`pdf-${index}-${pdfIndex}`}>
-                                                                <Card
-                                                                    size="small"
-                                                                    hoverable
-                                                                    style={{
-                                                                        border: '1px solid #ffccc7',
-                                                                        borderRadius: '4px',
-                                                                        backgroundColor: '#fff',
-                                                                        padding: '4px'
-                                                                    }}
-                                                                    bodyStyle={{ padding: '8px' }}
-                                                                    onClick={() => window.open(pdf.url, '_blank', 'noopener,noreferrer')}
-                                                                >
-                                                                    <Space size="small">
-                                                                        <FilePdfOutlined style={{ fontSize: '14px', color: '#ff4d4f' }} />
-                                                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                                                                <Text strong style={{ fontSize: '11px', display: 'block' }}>
-                                                                                    {pdf.title || getPdfTitle(pdf.url, 'PDF')}
-                                                                                </Text>
-                                                                        </div>
-                                                                    </Space>
-                                                                </Card>
-                                                            </Col>
-                                                        ))}
-                                                        {/* Video Cards */}
-                                                        {topicData.videos.map((video, videoIndex) => (
-                                                            <Col xs={24} sm={12} key={`video-${index}-${videoIndex}`}>
-                                                                <Card
-                                                                    size="small"
-                                                                    hoverable
-                                                                    style={{
-                                                                        border: '1px solid #ffccc7',
-                                                                        borderRadius: '4px',
-                                                                        backgroundColor: '#fff',
-                                                                        padding: '4px'
-                                                                    }}
-                                                                    bodyStyle={{ padding: '8px' }}
-                                                                    onClick={() => window.open(video.url, '_blank', 'noopener,noreferrer')}
-                                                                >
-                                                                    <Space size="small">
-                                                                        <PlayCircleOutlined style={{ fontSize: '14px', color: '#1890ff' }} />
-                                                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                                                            <Text strong style={{ fontSize: '11px', display: 'block' }}>
-                                                                                {video.title || getVideoTitle(video.url, 'Video')}
-                                                                            </Text>
-                                                                        </div>
-                                                                    </Space>
-                                                                </Card>
-                                                            </Col>
-                                                        ))}
-                                                    </Row>
-                                                </div>
-                                            )}
-
-                                            {/* Show message if no resources available */}
-                                            {topicData.pdfs.length === 0 && topicData.videos.length === 0 && (
-                                                <Text type="secondary" style={{ fontSize: '11px', fontStyle: 'italic' }}>
-                                                    No additional resources available.
-                                                </Text>
-                                            )}
                                         </Space>
                                     </Card>
-                                </Col>
-                            ))}
-                        </Row>
+                                );
+                            })}
+                        </Space>
                     </div>
                 )}
-
-                <Divider />
-
-                {/* Which Goals You Achieve Section */}
-                {goalJudgments.length > 0 && (
-                    <div style={{ marginBottom: '24px' }}>
-                        <Title level={4} style={{ marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
-                            <TrophyOutlined style={{ marginRight: '8px', color: '#52c41a' }} />
-                            Which Goals You Achieve
-                        </Title>
-                        
-                        {metGoals.length > 0 && (
-                            <div style={{ marginBottom: '16px' }}>
-                                <Text strong style={{ color: '#52c41a', fontSize: '14px' }}>Met ({metGoals.length})</Text>
-                                <Space direction="vertical" size="small" style={{ width: '100%', marginTop: '8px' }}>
-                                    {metGoals.map((judgment, index) => (
-                                        <Card key={index} size="small" style={{ backgroundColor: '#f6ffed', borderLeft: '3px solid #52c41a' }}>
-                                            <Space>
-                                                <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                                                <Text>{judgment.goal}</Text>
-                                            </Space>
-                                        </Card>
-                                    ))}
-                                </Space>
-                            </div>
-                        )}
-
-                        {partiallyMetGoals.length > 0 && (
-                            <div style={{ marginBottom: '16px' }}>
-                                <Text strong style={{ color: '#faad14', fontSize: '14px' }}>Partially Met ({partiallyMetGoals.length})</Text>
-                                <Space direction="vertical" size="small" style={{ width: '100%', marginTop: '8px' }}>
-                                    {partiallyMetGoals.map((judgment, index) => (
-                                        <Card key={index} size="small" style={{ backgroundColor: '#fffbe6', borderLeft: '3px solid #faad14' }}>
-                                            <Space>
-                                                <BulbOutlined style={{ color: '#faad14' }} />
-                                                <Text>{judgment.goal}</Text>
-                                            </Space>
-                                        </Card>
-                                    ))}
-                                </Space>
-                            </div>
-                        )}
-
-                        {notMetGoals.length > 0 && (
-                            <div>
-                                <Text strong style={{ color: '#ff4d4f', fontSize: '14px' }}>Not Yet Met ({notMetGoals.length})</Text>
-                                <Space direction="vertical" size="small" style={{ width: '100%', marginTop: '8px' }}>
-                                    {notMetGoals.map((judgment, index) => (
-                                        <Card key={index} size="small" style={{ backgroundColor: '#fff1f0', borderLeft: '3px solid #ff4d4f' }}>
-                                            <Space>
-                                                <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
-                                                <Text>{judgment.goal}</Text>
-                                            </Space>
-                                        </Card>
-                                    ))}
-                                </Space>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                <Divider />
-
-                {/* Overall Performance Summary */}
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '48px', color: assessment.color, marginBottom: '8px' }}>
-                        {assessment.icon}
-                    </div>
-                    <Title level={3} style={{ marginBottom: '8px' }}>Your Performance</Title>
-                    <div style={{ marginBottom: '16px' }}>
-                        <Text strong style={{ fontSize: '24px', color: assessment.color }}>
-                            Your Success Rate: {correctCount}/{totalQuestions}
-                        </Text>
-                        <div style={{ marginTop: '12px' }}>
-                            <Progress 
-                                percent={percentage} 
-                                strokeColor={assessment.color}
-                                format={() => `${percentage}%`}
-                                style={{ maxWidth: '300px', margin: '0 auto' }}
-                            />
-                        </div>
-                    </div>
-                    <Paragraph 
-                        style={{ 
-                            fontSize: '16px', 
-                            color: assessment.color,
-                            fontWeight: '500',
-                            marginBottom: '24px'
-                        }}
-                    >
-                        {assessment.message}
-                    </Paragraph>
-                </div>
 
             </Space>
         </Card>
     );
 }
+
+// Question Preview Rendering Functions
+const renderKeyboardQuestionPreview = (element, index) => {
+    if (!element) return null;
+
+    const { Question, Answers, Correct } = element;
+    const { Base_ImageURL, Code, Latex, Answers: correctAnswers } = Question;
+    const isCorrect = Correct === true || Correct === "true" || Correct === 1;
+
+    const reducedLatex = Answers && Answers[0] && Answers[0].List 
+        ? Answers[0].List.reduce((a, b) => a += ' ' + (b.code === '*' ? '\\cdot' : b.code), '') || '-'
+        : '-';
+
+    return (
+        <Space size="large" align="start">
+            {Base_ImageURL && (
+                <div>
+                    <img 
+                        src={Base_ImageURL}
+                        alt={Code}
+                        style={{ maxWidth: '200px', maxHeight: '150px', borderRadius: '4px' }}
+                    />
+                </div>
+            )}
+            <div>
+                {Latex && <LatexRenderer latex={Latex} />}
+                <div style={{ marginTop: '8px' }}>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>Your answer: </Text>
+                    <LatexRenderer latex={"$$" + reducedLatex + "$$"} />
+                </div>
+                {!isCorrect && correctAnswers && correctAnswers.length > 0 && (
+                    <div style={{ marginTop: '8px' }}>
+                        <Text type="secondary" style={{ fontSize: '12px', color: '#52c41a' }}>Correct answer(s): </Text>
+                        {correctAnswers.map((a, ai) => {
+                            const answerReduced = a.AnswerElements
+                                ?.sort((c, d) => c.Id > d.Id ? 1 : -1)
+                                .reduce((acc, b) => acc += ' ' + (b.TextPresentation || (b.Value === '*' ? '\\cdot' : b.Value)), '') || '-';
+                            return (
+                                <div key={ai}>
+                                    <LatexRenderer latex={"$$" + answerReduced + "$$"} />
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        </Space>
+    );
+};
+
+const renderClickableQuestionPreview = (element, index) => {
+    if (!element) return null;
+
+    const { Question, Answers } = element;
+
+    return (
+        <Row gutter={[8, 8]}>
+            <Col xs={24} sm={12}>
+                <Text type="secondary" style={{ fontSize: '12px' }}>Your answer(s)</Text>
+                <DisplayClickableQuestionAnswers 
+                    Question={Question}
+                    Answers={Answers}
+                />
+            </Col>
+            <Col xs={24} sm={12}>
+                <Text type="secondary" style={{ fontSize: '12px' }}>Correct answer(s)</Text>
+                <DisplayClickableQuestionAnswers 
+                    Question={Question}
+                />
+            </Col>
+        </Row>
+    );
+};
+
+const renderMultipleChoiceQuestionPreview = (element, index) => {
+    if (!element) return null;
+
+    const { Question, Answers } = element;
+    const { Base_ImageURL, Code, Choices, Latex } = Question;
+
+    return (
+        <Space size="large" align="start">
+            {Base_ImageURL && (
+                <div>
+                    <img 
+                        src={Base_ImageURL}
+                        alt={Code}
+                        style={{ maxWidth: '200px', maxHeight: '150px', borderRadius: '4px' }}
+                    />
+                </div>
+            )}
+            <div>
+                {Latex && <LatexRenderer latex={Latex} />}
+                {Choices && (
+                    <div style={{ marginTop: '8px' }}>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>Selected: </Text>
+                        {Answers && Answers.length > 0 ? (
+                            <Text>{Answers.map((a, i) => Choices.findIndex(c => c.Id === a.Id) + 1).join(', ')}</Text>
+                        ) : (
+                            <Text type="secondary">None</Text>
+                        )}
+                    </div>
+                )}
+            </div>
+        </Space>
+    );
+};
+
+const renderImageBasedQuestionPreview = (element, index) => {
+    if (!element) return null;
+
+    const { Question } = element;
+    const { Base_ImageURL, Code, QuestionText } = Question;
+
+    return (
+        <Space size="large" align="start">
+            {Base_ImageURL && (
+                <div>
+                    <img 
+                        src={Base_ImageURL}
+                        alt={Code}
+                        style={{ maxWidth: '200px', maxHeight: '150px', borderRadius: '4px' }}
+                    />
+                </div>
+            )}
+            {QuestionText && (
+                <div>
+                    <LatexRenderer latex={QuestionText} />
+                </div>
+            )}
+        </Space>
+    );
+};
