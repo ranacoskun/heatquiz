@@ -34,15 +34,20 @@ if ([string]::IsNullOrWhiteSpace($PsqlConn)) {
   )
 } else {
   Write-Host "Connecting via explicit connection string (PsqlConn)."
+  # IMPORTANT: psql expects options BEFORE the connection string/DBNAME.
+  # If you put the conn string first, psql treats later flags/values as extra args.
   $args = @(
-    $PsqlConn,
     "-v", "map_id=$MapId",
-    "-f", $sql
+    "-f", $sql,
+    $PsqlConn
   )
 }
 
 # Run psql and save output. Include stderr so errors get captured too.
-$output = & psql @args 2>&1
+$prev = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+$output = (& psql @args 2>&1 | Out-String)
+$ErrorActionPreference = $prev
 $output | Out-File -FilePath $OutFile -Encoding utf8
 if ($LASTEXITCODE -ne 0) {
   throw "psql failed (exit code $LASTEXITCODE). Check $OutFile for details."
