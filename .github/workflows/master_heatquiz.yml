@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_PATH: QuizAPI/QuizAPI/QuizAPI.csproj
+  PROJECT_PATH: QuizAPI.csproj
   WORKING_DIR: QuizAPI/QuizAPI
 
 jobs:
