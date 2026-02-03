@@ -189,6 +189,9 @@ namespace QuizAPI
 
             app.UseCors("MyPolicy");
 
+            // Serve static files from wwwroot at the site root (needed for /dist/* assets referenced by views)
+            app.UseStaticFiles();
+
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
