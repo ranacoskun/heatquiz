@@ -237,6 +237,12 @@ $env:PGSSLMODE="require"
 .\scripts\export_used_urls_map.ps1 -MapId 31 -OutFile .\used_map31_urls.txt
 ```
 
+If you still see it trying to connect to `localhost`, pass an explicit connection string:
+
+```powershell
+.\scripts\export_used_urls_map.ps1 -MapId 31 -OutFile .\used_map31_urls.txt -PsqlConn "host=heatquizdb.postgres.database.azure.com port=5432 dbname=postgres user=heatquizadmin sslmode=require"
+```
+
 **If PowerShell says “running scripts is disabled on this system”**
 
 Run ONE of these, then try again:

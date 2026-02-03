@@ -19,24 +19,34 @@ Write-Host "Exporting used URLs for MapId=$MapId to $OutFile"
 
 if ([string]::IsNullOrWhiteSpace($PsqlConn)) {
   # Use PGHOST/PGUSER/PGDATABASE/PGPORT/PGPASSWORD environment variables.
-  # Important: Azure requires SSL; ensure your env includes sslmode=require in PGSSLMODE or via conn string.
-  # If you don't have env vars set, go to Azure DB → Connect page and copy the export lines.
-  $cmd = @(
-    "psql",
+  # If these aren't set, psql falls back to localhost + your Windows username (that's what happened to you).
+  if ([string]::IsNullOrWhiteSpace($env:PGHOST) -or [string]::IsNullOrWhiteSpace($env:PGUSER)) {
+    throw "Missing connection info. Set PGHOST/PGUSER/PGDATABASE/PGPORT/PGPASSWORD (from Azure DB → Connect page), or pass -PsqlConn."
+  }
+  if ([string]::IsNullOrWhiteSpace($env:PGSSLMODE)) {
+    Write-Warning "PGSSLMODE is not set. Azure requires SSL. Setting PGSSLMODE=require for this process."
+    $env:PGSSLMODE = "require"
+  }
+  Write-Host "Connecting via PG* env vars: PGHOST=$env:PGHOST PGUSER=$env:PGUSER PGDATABASE=$env:PGDATABASE PGPORT=$env:PGPORT PGSSLMODE=$env:PGSSLMODE"
+  $args = @(
     "-v", "map_id=$MapId",
-    "-f", "`"$sql`""
-  ) -join " "
+    "-f", $sql
+  )
 } else {
-  $cmd = @(
-    "psql",
-    "`"$PsqlConn`"",
+  Write-Host "Connecting via explicit connection string (PsqlConn)."
+  $args = @(
+    $PsqlConn,
     "-v", "map_id=$MapId",
-    "-f", "`"$sql`""
-  ) -join " "
+    "-f", $sql
+  )
 }
 
-# Write one URL per line
-& powershell -NoProfile -Command "$cmd" | Out-File -FilePath $OutFile -Encoding utf8
+# Run psql and save output. Include stderr so errors get captured too.
+$output = & psql @args 2>&1
+$output | Out-File -FilePath $OutFile -Encoding utf8
+if ($LASTEXITCODE -ne 0) {
+  throw "psql failed (exit code $LASTEXITCODE). Check $OutFile for details."
+}
 
 Write-Host "Done. Preview:"
 Get-Content $OutFile -TotalCount 20
