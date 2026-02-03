@@ -12,6 +12,8 @@ on:
 env:
   PROJECT_PATH: QuizAPI.csproj
   WORKING_DIR: QuizAPI/QuizAPI
+  AZURE_WEBAPP_NAME: heatquiz
+  AZURE_RESOURCE_GROUP: heatquiz_group
 
 jobs:
   build:
@@ -77,10 +79,20 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_812100105BF941D29AB58DB8895AEDDD }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0A4641C01880459FA7AAAD6AD9DA80A5 }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: heatquiz
-          slot-name: Production
-          package: ${{ runner.temp }}/app.zip
+      # OneDeploy frequently returns 500/502 even for small packages.
+      # Use Kudu ZipDeploy instead (more reliable).
+      - name: Configure run-from-package
+        shell: pwsh
+        run: |
+          az webapp config appsettings set `
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" `
+            --name "${{ env.AZURE_WEBAPP_NAME }}" `
+            --settings WEBSITE_RUN_FROM_PACKAGE=1
+
+      - name: Deploy (ZipDeploy via Kudu)
+        shell: pwsh
+        run: |
+          az webapp deployment source config-zip `
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" `
+            --name "${{ env.AZURE_WEBAPP_NAME }}" `
+            --src "${{ runner.temp }}\\app.zip"
