@@ -36,14 +36,10 @@ jobs:
 
       - name: Install frontend tooling (npm)
         working-directory: ${{ env.WORKING_DIR }}
-        env:
-          NODE_OPTIONS: --openssl-legacy-provider
         run: npm install
 
       - name: Publish (self-contained, Windows)
         working-directory: ${{ env.WORKING_DIR }}
-        env:
-          NODE_OPTIONS: --openssl-legacy-provider
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r win-x64 --self-contained true -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
