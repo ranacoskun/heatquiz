@@ -36,10 +36,16 @@ lerna-debug.log*
 build/
 dist/
 *.local
+.env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Local deployment helpers / outputs
+used_map*_urls.txt
+wwwroot_pruned_backup_*/
 
 # .NET / C# Build Artifacts
 bin/

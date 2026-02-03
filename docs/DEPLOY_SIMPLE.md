@@ -217,42 +217,25 @@ If you removed learning paths / most maps, you can delete most media. The safe w
 - **Keep only files referenced by the DB for Map 31**
 - Move everything else out of `wwwroot` to reduce deploy size
 
-### Step A — export “used URLs for Map 31” from Azure DB
+### Step A — export “used URLs for Map 31” from Azure DB (automatic)
 
-In Azure `psql` (connected to your Azure server), run:
+1. Make sure you can connect to Azure DB from your PC (use the Azure DB **Connect** page).
+2. Set the `PG*` env vars like Azure shows (Host/User/DB/Port/Password). Example (PowerShell):
 
-```sql
-\pset pager off
-
--- Map 31 uses question series + element button images.
--- Export references that are directly stored on map elements AND the element-images row used by Map 31.
-
-WITH map31 AS (
-  SELECT DISTINCT "QuestionSeriesId" AS series_id, "CourseMapElementImagesId" AS img_id
-  FROM "CourseMapElement"
-  WHERE "MapId" = 31
-),
-urls AS (
-  SELECT "LargeMapURL" AS url
-  FROM "CourseMap"
-  WHERE "Id" = 31
-
-  UNION ALL
-  SELECT "Play"  FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "Play"  IS NOT NULL
-  UNION ALL
-  SELECT "PDF"   FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "PDF"   IS NOT NULL
-  UNION ALL
-  SELECT "Video" FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "Video" IS NOT NULL
-  UNION ALL
-  SELECT "Link"  FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "Link"  IS NOT NULL
-)
-SELECT DISTINCT url
-FROM urls
-WHERE url IS NOT NULL AND url <> ''
-ORDER BY url;
+```powershell
+$env:PGHOST="heatquizdb.postgres.database.azure.com"
+$env:PGPORT="5432"
+$env:PGDATABASE="postgres"
+$env:PGUSER="heatquizadmin"          # if this fails, try heatquizadmin@heatquizdb
+$env:PGPASSWORD="YourPasswordHere"
+$env:PGSSLMODE="require"
 ```
 
-Copy the output URLs into a local text file, one per line, e.g. `used_map31_urls.txt`.
+3. Run the export script (this creates `used_map31_urls.txt`):
+
+```powershell
+.\scripts\export_used_urls_map.ps1 -MapId 31 -OutFile .\used_map31_urls.txt
+```
 
 ### Step B — prune `wwwroot` using the script (dry-run first)
 
