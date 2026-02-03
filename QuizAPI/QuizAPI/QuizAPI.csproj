@@ -35,6 +35,21 @@
     <Content Remove="ClientApp\**" />
   </ItemGroup>
 
+  <!--
+    IMPORTANT (Azure App Service deployment):
+    `wwwroot` in this repo contains multiple GB of course media (mp4/mp3, large images).
+    Deploying all of it in one package commonly fails (502/500) and exceeds plan storage limits.
+    Exclude the largest media folders from publish by default; host them separately (Azure Storage)
+    or mount them into the app later if needed.
+  -->
+  <ItemGroup>
+    <Content Remove="wwwroot\Maps\**" />
+    <Content Remove="wwwroot\SimpleClickableQuestions\**" />
+    <Content Remove="wwwroot\Tutorials\**" />
+    <Content Remove="wwwroot\CourseaMap\**" />
+    <Content Remove="wwwroot\NumericKeys\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <Folder Include="Models\QuestionTemplates\ViewModels\" />
     <Folder Include="wwwroot\NumericKeys\" />
