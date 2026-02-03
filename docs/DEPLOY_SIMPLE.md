@@ -485,6 +485,38 @@ That means:
 
 ---
 
+## If the website shows a generic “Error. An error occurred while processing your request.”
+
+This means the app crashed on the server, but Azure is hiding the details.
+
+### Step 1 — Open logs
+App Service (`heatquiz`) → **Log stream**
+
+Refresh the site once, then look for the first exception in the log stream.
+
+### Step 2 — Most common fix: database connection string
+App Service → **Environment variables** → **App settings**
+
+Make sure you have:
+- `ConnectionStrings__DefaultConnection` = a valid Azure Postgres connection string
+
+Important details:
+- Database name must match where you imported the schema (often `postgres` unless you created `quizdb`)
+- Azure Postgres requires SSL, so include:
+  - `Ssl Mode=Require;Trust Server Certificate=true;`
+
+### Step 3 — Temporarily enable more detail (ONLY for debugging)
+In App Service → **Environment variables** → **App settings**, add:
+- `ASPNETCORE_ENVIRONMENT` = `Development`
+- `ASPNETCORE_DETAILEDERRORS` = `true`
+- `Logging__LogLevel__Default` = `Information`
+
+Click **Save** and let the app restart, then refresh the site and check **Log stream** again.
+
+⚠️ After you capture the error, set `ASPNETCORE_ENVIRONMENT` back to `Production` (or delete it).
+
+---
+
 ## Updating Your App
 
 ### Automatic Updates (GitHub Connected)
