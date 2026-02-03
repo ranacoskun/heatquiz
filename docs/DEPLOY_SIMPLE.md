@@ -237,6 +237,20 @@ $env:PGSSLMODE="require"
 .\scripts\export_used_urls_map.ps1 -MapId 31 -OutFile .\used_map31_urls.txt
 ```
 
+**If PowerShell says “running scripts is disabled on this system”**
+
+Run ONE of these, then try again:
+
+```powershell
+# Recommended (safe): allow local scripts for your user only
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+```powershell
+# One-time bypass (no system changes)
+powershell -ExecutionPolicy Bypass -File .\scripts\export_used_urls_map.ps1 -MapId 31 -OutFile .\used_map31_urls.txt
+```
+
 ### Step B — prune `wwwroot` using the script (dry-run first)
 
 From repo root in PowerShell:
