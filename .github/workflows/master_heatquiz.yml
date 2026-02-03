@@ -89,10 +89,32 @@ jobs:
             --name "${{ env.AZURE_WEBAPP_NAME }}" `
             --settings WEBSITE_RUN_FROM_PACKAGE=1
 
-      - name: Deploy (ZipDeploy via Kudu)
+      - name: Show package size
         shell: pwsh
         run: |
-          az webapp deployment source config-zip `
-            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" `
-            --name "${{ env.AZURE_WEBAPP_NAME }}" `
-            --src "${{ runner.temp }}\\app.zip"
+          Get-Item "${{ runner.temp }}\\app.zip" | Format-List Name,Length,LastWriteTime
+
+      # Use the newer command (replacement for config-zip). This uses OneDeploy under the hood.
+      # With the package pruned, this should succeed; we also retry transient 502/5xx failures.
+      - name: Deploy (az webapp deploy, with retries)
+        shell: pwsh
+        run: |
+          $zip = "${{ runner.temp }}\app.zip"
+          $attempts = 6
+          for ($i=1; $i -le $attempts; $i++) {
+            Write-Host "Deploy attempt $i / $attempts..."
+            az webapp deploy `
+              --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" `
+              --name "${{ env.AZURE_WEBAPP_NAME }}" `
+              --type zip `
+              --src-path $zip
+
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "Deploy succeeded."
+              exit 0
+            }
+
+            Write-Warning "Deploy failed (exit $LASTEXITCODE). Waiting before retry..."
+            Start-Sleep -Seconds (10 * $i)
+          }
+          throw "Deploy failed after $attempts attempts."
