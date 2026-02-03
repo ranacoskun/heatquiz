@@ -9,25 +9,42 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  PROJECT_PATH: QuizAPI/QuizAPI/QuizAPI.csproj
+  WORKING_DIR: QuizAPI/QuizAPI
+
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read # required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      # QuizAPI targets netcoreapp2.0. Newer SDKs (like .NET 8) won't build it.
+      - name: Set up .NET Core SDK 2.1.x
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: "2.1.818"
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      # Webpack 2 + old toolchain often breaks on very new Node due to OpenSSL.
+      - name: Setup Node.js 16
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Install frontend tooling (npm)
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+        run: npm install
+
+      - name: Publish (self-contained, Windows)
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r win-x64 --self-contained true -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -39,15 +56,16 @@ jobs:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write # required for requesting the JWT (OIDC)
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+          path: .
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -59,7 +77,6 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'heatquiz'
-          slot-name: 'Production'
+          app-name: heatquiz
+          slot-name: Production
           package: .
-          
