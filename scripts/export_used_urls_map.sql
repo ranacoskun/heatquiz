@@ -70,88 +70,85 @@ WHERE e."MapId" = :map_id
 
 -- 5) Media from question series linked to this map (Map 31 uses QuestionSeriesId)
 DO $$
-DECLARE
-  map_id int := current_setting('map_id', true)::int;
 BEGIN
-  -- Make psql -v map_id visible inside DO
-  -- If current_setting fails (older PG), fallback to :map_id via psql variable is not possible inside DO.
-  -- So we re-read from the CourseMapElement table directly with the same literal.
-  IF map_id IS NULL THEN
-    RAISE NOTICE 'map_id setting not available; using map_id from CourseMapElement queries';
+  -- Note: psql replaces :map_id before sending this script to the server,
+  -- so using it inside format() is safe here.
+
+  IF to_regclass('public."QuestionSeriesElement"') IS NULL THEN
+    RAISE NOTICE 'Skipping question-series media: table "QuestionSeriesElement" not found';
+    RETURN;
   END IF;
-END $$;
 
--- QuestionBase (base class table in DB dump is usually "QuestionBase")
-\if :{?map_id}
-\endif
-
--- Insert QuestionBase URLs (if table exists)
-DO $$
-BEGIN
   IF to_regclass('public."QuestionBase"') IS NOT NULL THEN
-    EXECUTE $q$
+    EXECUTE format($f$
       INSERT INTO tmp_used_urls(url)
       SELECT q."Base_ImageURL"
       FROM "CourseMapElement" me
       JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
       JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = $q$ || :map_id || $q$
+      WHERE me."MapId" = %s
         AND q."Base_ImageURL" IS NOT NULL AND q."Base_ImageURL" <> ''
-    $q$;
+    $f$, :map_id);
 
-    EXECUTE $q$
+    EXECUTE format($f$
       INSERT INTO tmp_used_urls(url)
       SELECT q."ThumbnailURL"
       FROM "CourseMapElement" me
       JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
       JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = $q$ || :map_id || $q$
+      WHERE me."MapId" = %s
         AND q."ThumbnailURL" IS NOT NULL AND q."ThumbnailURL" <> ''
-    $q$;
+    $f$, :map_id);
 
-    EXECUTE $q$
+    EXECUTE format($f$
       INSERT INTO tmp_used_urls(url)
       SELECT q."PDFURL"
       FROM "CourseMapElement" me
       JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
       JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = $q$ || :map_id || $q$
+      WHERE me."MapId" = %s
         AND q."PDFURL" IS NOT NULL AND q."PDFURL" <> ''
-    $q$;
+    $f$, :map_id);
 
-    EXECUTE $q$
+    EXECUTE format($f$
       INSERT INTO tmp_used_urls(url)
       SELECT q."VIDEOURL"
       FROM "CourseMapElement" me
       JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
       JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = $q$ || :map_id || $q$
+      WHERE me."MapId" = %s
         AND q."VIDEOURL" IS NOT NULL AND q."VIDEOURL" <> ''
-    $q$;
+    $f$, :map_id);
+  ELSE
+    RAISE NOTICE 'Skipping QuestionBase media: table "QuestionBase" not found';
   END IF;
 
   IF to_regclass('public."KeyboardQuestion"') IS NOT NULL THEN
-    EXECUTE $q$
+    EXECUTE format($f$
       INSERT INTO tmp_used_urls(url)
       SELECT kq."ImageURL"
       FROM "CourseMapElement" me
       JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
       JOIN "KeyboardQuestion" kq ON kq."Id" = se."KeyboardQuestionId"
-      WHERE me."MapId" = $q$ || :map_id || $q$
+      WHERE me."MapId" = %s
         AND kq."ImageURL" IS NOT NULL AND kq."ImageURL" <> ''
-    $q$;
+    $f$, :map_id);
+  ELSE
+    RAISE NOTICE 'Skipping KeyboardQuestion media: table "KeyboardQuestion" not found';
   END IF;
 
   IF to_regclass('public."MultipleChoiceQuestion"') IS NOT NULL THEN
-    EXECUTE $q$
+    EXECUTE format($f$
       INSERT INTO tmp_used_urls(url)
       SELECT mcq."ImageURL"
       FROM "CourseMapElement" me
       JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
       JOIN "MultipleChoiceQuestion" mcq ON mcq."Id" = se."MultipleChoiceQuestionId"
-      WHERE me."MapId" = $q$ || :map_id || $q$
+      WHERE me."MapId" = %s
         AND mcq."ImageURL" IS NOT NULL AND mcq."ImageURL" <> ''
-    $q$;
+    $f$, :map_id);
+  ELSE
+    RAISE NOTICE 'Skipping MultipleChoiceQuestion media: table "MultipleChoiceQuestion" not found';
   END IF;
 END $$;
 
