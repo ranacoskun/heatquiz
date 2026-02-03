@@ -14,7 +14,9 @@
 \quit 1
 \endif
 
-CREATE TEMP TABLE tmp_used_urls(url text) ON COMMIT DROP;
+-- Note: DO NOT use "ON COMMIT DROP" here because psql autocommits each statement by default.
+-- With ON COMMIT DROP, the temp table would be created and immediately dropped after that statement.
+CREATE TEMP TABLE tmp_used_urls(url text);
 
 -- 1) Map background (LargeMapURL)
 INSERT INTO tmp_used_urls(url)
