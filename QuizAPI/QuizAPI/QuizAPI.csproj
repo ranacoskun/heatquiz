@@ -43,11 +43,18 @@
     or mount them into the app later if needed.
   -->
   <ItemGroup>
-    <Content Remove="wwwroot\Maps\**" />
-    <Content Remove="wwwroot\SimpleClickableQuestions\**" />
-    <Content Remove="wwwroot\Tutorials\**" />
+    <!-- Keep images where possible, but exclude very large/bulky media files that break App Service deploys -->
+    <Content Remove="wwwroot\Maps\**\*.mp4" />
+    <Content Remove="wwwroot\Maps\**\*.mp3" />
+
+    <Content Remove="wwwroot\SimpleClickableQuestions\**\*.mp4" />
+    <Content Remove="wwwroot\SimpleClickableQuestions\**\*.mp3" />
+
+    <Content Remove="wwwroot\Tutorials\**\*.mp4" />
+    <Content Remove="wwwroot\Tutorials\**\*.mp3" />
+
+    <!-- CourseaMap is huge; keep it excluded for now (can be moved to Azure Storage later) -->
     <Content Remove="wwwroot\CourseaMap\**" />
-    <Content Remove="wwwroot\NumericKeys\**" />
   </ItemGroup>
 
   <ItemGroup>
