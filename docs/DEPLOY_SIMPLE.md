@@ -209,6 +209,65 @@ This repo’s `QuizAPI/QuizAPI/wwwroot` contains **multiple GB** of media (mp4/m
 If your app needs these assets in production, host them separately and link/mount them later:
 - **Recommended:** Azure Storage (Blob or Azure Files) and serve via URLs
 
+---
+
+## Optional: shrink `wwwroot` to only what Map 31 uses (recommended)
+
+If you removed learning paths / most maps, you can delete most media. The safe way is:
+- **Keep only files referenced by the DB for Map 31**
+- Move everything else out of `wwwroot` to reduce deploy size
+
+### Step A — export “used URLs for Map 31” from Azure DB
+
+In Azure `psql` (connected to your Azure server), run:
+
+```sql
+\pset pager off
+
+-- Map 31 uses question series + element button images.
+-- Export references that are directly stored on map elements AND the element-images row used by Map 31.
+
+WITH map31 AS (
+  SELECT DISTINCT "QuestionSeriesId" AS series_id, "CourseMapElementImagesId" AS img_id
+  FROM "CourseMapElement"
+  WHERE "MapId" = 31
+),
+urls AS (
+  SELECT "LargeMapURL" AS url
+  FROM "CourseMap"
+  WHERE "Id" = 31
+
+  UNION ALL
+  SELECT "Play"  FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "Play"  IS NOT NULL
+  UNION ALL
+  SELECT "PDF"   FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "PDF"   IS NOT NULL
+  UNION ALL
+  SELECT "Video" FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "Video" IS NOT NULL
+  UNION ALL
+  SELECT "Link"  FROM "CourseMapElementImages" WHERE "Id" IN (SELECT img_id FROM map31) AND "Link"  IS NOT NULL
+)
+SELECT DISTINCT url
+FROM urls
+WHERE url IS NOT NULL AND url <> ''
+ORDER BY url;
+```
+
+Copy the output URLs into a local text file, one per line, e.g. `used_map31_urls.txt`.
+
+### Step B — prune `wwwroot` using the script (dry-run first)
+
+From repo root in PowerShell:
+
+```powershell
+# Dry run (no changes)
+.\scripts\prune_wwwroot.ps1 -UsedUrlsFile .\used_map31_urls.txt
+
+# Actually move unused files to a backup folder
+.\scripts\prune_wwwroot.ps1 -UsedUrlsFile .\used_map31_urls.txt -Apply
+```
+
+This will keep only the referenced files and move the rest into a backup folder.
+
 #### **Option B: Manual Deploy from Visual Studio**
 
 1. Open your project in Visual Studio
