@@ -193,6 +193,22 @@ Tip: If you get SSL/cert errors, use the exact connection string Azure provides 
 
 ✅ Now every `git push` will automatically deploy!
 
+---
+
+## IMPORTANT: Large `wwwroot` assets (videos/images) can break App Service deploy
+
+This repo’s `QuizAPI/QuizAPI/wwwroot` contains **multiple GB** of media (mp4/mp3/images). Deploying it all can fail with **OneDeploy 500/502**.
+
+**Fix used in this repo:** the publish step excludes the biggest folders by default:
+- `wwwroot/Maps`
+- `wwwroot/SimpleClickableQuestions`
+- `wwwroot/Tutorials`
+- `wwwroot/CourseaMap`
+- `wwwroot/NumericKeys`
+
+If your app needs these assets in production, host them separately and link/mount them later:
+- **Recommended:** Azure Storage (Blob or Azure Files) and serve via URLs
+
 #### **Option B: Manual Deploy from Visual Studio**
 
 1. Open your project in Visual Studio
