@@ -18,6 +18,12 @@
 -- With ON COMMIT DROP, the temp table would be created and immediately dropped after that statement.
 CREATE TEMP TABLE tmp_used_urls(url text);
 
+-- Detect optional tables (psql-side) so we can skip sections cleanly.
+SELECT to_regclass('public."QuestionSeriesElement"') IS NOT NULL AS has_qse \gset
+SELECT to_regclass('public."QuestionBase"') IS NOT NULL AS has_qb \gset
+SELECT to_regclass('public."KeyboardQuestion"') IS NOT NULL AS has_kq \gset
+SELECT to_regclass('public."MultipleChoiceQuestion"') IS NOT NULL AS has_mcq \gset
+
 -- 1) Map background (LargeMapURL)
 INSERT INTO tmp_used_urls(url)
 SELECT "LargeMapURL"
@@ -71,88 +77,62 @@ WHERE e."MapId" = :map_id
   AND bi."URL" <> '';
 
 -- 5) Media from question series linked to this map (Map 31 uses QuestionSeriesId)
-DO $$
-BEGIN
-  -- Note: psql replaces :map_id before sending this script to the server,
-  -- so using it inside format() is safe here.
+-- Only run if the underlying tables exist in this database.
+\if :has_qse
+\if :has_qb
+INSERT INTO tmp_used_urls(url)
+SELECT q."Base_ImageURL"
+FROM "CourseMapElement" me
+JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
+JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
+WHERE me."MapId" = :map_id
+  AND q."Base_ImageURL" IS NOT NULL AND q."Base_ImageURL" <> '';
 
-  IF to_regclass('public."QuestionSeriesElement"') IS NULL THEN
-    RAISE NOTICE 'Skipping question-series media: table "QuestionSeriesElement" not found';
-    RETURN;
-  END IF;
+INSERT INTO tmp_used_urls(url)
+SELECT q."ThumbnailURL"
+FROM "CourseMapElement" me
+JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
+JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
+WHERE me."MapId" = :map_id
+  AND q."ThumbnailURL" IS NOT NULL AND q."ThumbnailURL" <> '';
 
-  IF to_regclass('public."QuestionBase"') IS NOT NULL THEN
-    EXECUTE format($f$
-      INSERT INTO tmp_used_urls(url)
-      SELECT q."Base_ImageURL"
-      FROM "CourseMapElement" me
-      JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
-      JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = %s
-        AND q."Base_ImageURL" IS NOT NULL AND q."Base_ImageURL" <> ''
-    $f$, :map_id);
+INSERT INTO tmp_used_urls(url)
+SELECT q."PDFURL"
+FROM "CourseMapElement" me
+JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
+JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
+WHERE me."MapId" = :map_id
+  AND q."PDFURL" IS NOT NULL AND q."PDFURL" <> '';
 
-    EXECUTE format($f$
-      INSERT INTO tmp_used_urls(url)
-      SELECT q."ThumbnailURL"
-      FROM "CourseMapElement" me
-      JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
-      JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = %s
-        AND q."ThumbnailURL" IS NOT NULL AND q."ThumbnailURL" <> ''
-    $f$, :map_id);
+INSERT INTO tmp_used_urls(url)
+SELECT q."VIDEOURL"
+FROM "CourseMapElement" me
+JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
+JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
+WHERE me."MapId" = :map_id
+  AND q."VIDEOURL" IS NOT NULL AND q."VIDEOURL" <> '';
+\endif
 
-    EXECUTE format($f$
-      INSERT INTO tmp_used_urls(url)
-      SELECT q."PDFURL"
-      FROM "CourseMapElement" me
-      JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
-      JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = %s
-        AND q."PDFURL" IS NOT NULL AND q."PDFURL" <> ''
-    $f$, :map_id);
+\if :has_kq
+INSERT INTO tmp_used_urls(url)
+SELECT kq."ImageURL"
+FROM "CourseMapElement" me
+JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
+JOIN "KeyboardQuestion" kq ON kq."Id" = se."KeyboardQuestionId"
+WHERE me."MapId" = :map_id
+  AND kq."ImageURL" IS NOT NULL AND kq."ImageURL" <> '';
+\endif
 
-    EXECUTE format($f$
-      INSERT INTO tmp_used_urls(url)
-      SELECT q."VIDEOURL"
-      FROM "CourseMapElement" me
-      JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
-      JOIN "QuestionBase" q ON q."Id" = se."QuestionId"
-      WHERE me."MapId" = %s
-        AND q."VIDEOURL" IS NOT NULL AND q."VIDEOURL" <> ''
-    $f$, :map_id);
-  ELSE
-    RAISE NOTICE 'Skipping QuestionBase media: table "QuestionBase" not found';
-  END IF;
-
-  IF to_regclass('public."KeyboardQuestion"') IS NOT NULL THEN
-    EXECUTE format($f$
-      INSERT INTO tmp_used_urls(url)
-      SELECT kq."ImageURL"
-      FROM "CourseMapElement" me
-      JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
-      JOIN "KeyboardQuestion" kq ON kq."Id" = se."KeyboardQuestionId"
-      WHERE me."MapId" = %s
-        AND kq."ImageURL" IS NOT NULL AND kq."ImageURL" <> ''
-    $f$, :map_id);
-  ELSE
-    RAISE NOTICE 'Skipping KeyboardQuestion media: table "KeyboardQuestion" not found';
-  END IF;
-
-  IF to_regclass('public."MultipleChoiceQuestion"') IS NOT NULL THEN
-    EXECUTE format($f$
-      INSERT INTO tmp_used_urls(url)
-      SELECT mcq."ImageURL"
-      FROM "CourseMapElement" me
-      JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
-      JOIN "MultipleChoiceQuestion" mcq ON mcq."Id" = se."MultipleChoiceQuestionId"
-      WHERE me."MapId" = %s
-        AND mcq."ImageURL" IS NOT NULL AND mcq."ImageURL" <> ''
-    $f$, :map_id);
-  ELSE
-    RAISE NOTICE 'Skipping MultipleChoiceQuestion media: table "MultipleChoiceQuestion" not found';
-  END IF;
-END $$;
+\if :has_mcq
+INSERT INTO tmp_used_urls(url)
+SELECT mcq."ImageURL"
+FROM "CourseMapElement" me
+JOIN "QuestionSeriesElement" se ON se."SeriesId" = me."QuestionSeriesId"
+JOIN "MultipleChoiceQuestion" mcq ON mcq."Id" = se."MultipleChoiceQuestionId"
+WHERE me."MapId" = :map_id
+  AND mcq."ImageURL" IS NOT NULL AND mcq."ImageURL" <> '';
+\endif
+\endif
 
 -- Final output: one URL per line
 SELECT DISTINCT url
