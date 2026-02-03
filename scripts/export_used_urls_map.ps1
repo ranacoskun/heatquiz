@@ -29,6 +29,10 @@ if ([string]::IsNullOrWhiteSpace($PsqlConn)) {
   }
   Write-Host "Connecting via PG* env vars: PGHOST=$env:PGHOST PGUSER=$env:PGUSER PGDATABASE=$env:PGDATABASE PGPORT=$env:PGPORT PGSSLMODE=$env:PGSSLMODE"
   $args = @(
+    "-X",                 # don't read ~/.psqlrc
+    "-q",                 # quiet (no INSERT 0 n chatter)
+    "-t", "-A",           # tuples-only, unaligned (1 url per line)
+    "-P", "pager=off",
     "-v", "map_id=$MapId",
     "-f", $sql
   )
@@ -37,6 +41,10 @@ if ([string]::IsNullOrWhiteSpace($PsqlConn)) {
   # IMPORTANT: psql expects options BEFORE the connection string/DBNAME.
   # If you put the conn string first, psql treats later flags/values as extra args.
   $args = @(
+    "-X",
+    "-q",
+    "-t", "-A",
+    "-P", "pager=off",
     "-v", "map_id=$MapId",
     "-f", $sql,
     $PsqlConn

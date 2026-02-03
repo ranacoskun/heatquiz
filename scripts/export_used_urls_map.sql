@@ -5,7 +5,6 @@
 --   psql ... -v map_id=31 -f scripts/export_used_urls_map.sql > used_map31_urls.txt
 
 \set ON_ERROR_STOP on
-\pset pager off
 
 -- Required variable
 \if :{?map_id}
