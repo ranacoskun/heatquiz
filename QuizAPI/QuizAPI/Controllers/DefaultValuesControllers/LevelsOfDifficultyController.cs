@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizAPI.Data;
+using QuizAPI.Mapping;
 using QuizAPI.Models.DefaultValues.LevelsOfDifficulty;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,8 @@ namespace QuizAPI.Controllers.DefaultValuesControllers
     public class LevelsOfDifficultyController : Controller
     {
         private readonly IMapper _mapper;
-        public const string FILES_PATH = "http://167.86.98.171:6001/Files/";
+        // Prefer centrally configured base URL (set via appsettings / Azure App Service config).
+        private static string FILES_PATH => MappingProfile.FILES_PATH;
 
         private readonly ApplicationDbContext _applicationDbContext;
 

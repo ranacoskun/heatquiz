@@ -17,7 +17,7 @@ namespace QuizAPI.Models.DefaultValues.ImageAnswers.ViewModels
 
         public List<OwnerInfoViewModel> Owners { get; set; } = new List<OwnerInfoViewModel>();
 
-        public int DataPoolId { get; set; }
+        public new int DataPoolId { get; set; }
 
     }
 }

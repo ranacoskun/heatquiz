@@ -35,7 +35,7 @@ namespace QuizAPI.Models.Course.ViewModels
 
         public List<CourseMapViewModel> CourseMaps { get; set; } = new List<CourseMapViewModel>();
 
-        public int DataPoolId { get; set; }
+        public new int DataPoolId { get; set; }
 
     }
 }

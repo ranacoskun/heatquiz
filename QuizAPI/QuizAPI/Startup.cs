@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using QuizAPI.Data;
+using QuizAPI.Mapping;
 using QuizAPI.Middleware;
 using QuizAPI.Models;
 using QuizAPI.Services;
@@ -30,15 +31,37 @@ namespace QuizAPI
 {
     public class Startup
     {
-        public static readonly string secretKey = "mysupersecret_secretkey!123";
-        public static readonly string issure = "AltairCA";
-        public static readonly string audience = "AltairCAAudience";
-        public static SymmetricSecurityKey signingKey;
+        // NOTE: This project targets netcoreapp2.0; keep configuration usage compatible with ASP.NET Core 2.x.
+        // For Azure App Service, set these via App Settings (environment variables).
+        private const string DevFallbackJwtKey = "mysupersecret_secretkey!123"; // MUST be overridden in production.
+
+        private readonly string _jwtIssuer;
+        private readonly string _jwtAudience;
+        private readonly SymmetricSecurityKey _signingKey;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
+
+            _jwtIssuer = (Configuration["Jwt:Issuer"] ?? "AltairCA").Trim();
+            _jwtAudience = (Configuration["Jwt:Audience"] ?? "AltairCAAudience").Trim();
+
+            // If Jwt:Key exists but is empty, fall back to the dev key (so local dev doesn't crash).
+            // In Azure/production, override Jwt:Key with a strong secret via App Service config.
+            var jwtKey = (Configuration["Jwt:Key"] ?? "").Trim();
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                jwtKey = DevFallbackJwtKey;
+            }
+            _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey));
+
+            // Configure file URL base used in API responses (avoid hardcoded legacy hosts / mixed-content issues).
+            // Expected: "https://<your-backend>.azurewebsites.net/Files" (no trailing slash).
+            var filesBaseUrl = (Configuration["App:FilesBaseUrl"] ?? Configuration["FILES_BASE_URL"] ?? "").Trim();
+            if (!string.IsNullOrEmpty(filesBaseUrl))
+            {
+                MappingProfile.FILES_PATH = filesBaseUrl.TrimEnd('/');
+            }
         }
 
         public IConfiguration Configuration { get; }
@@ -50,9 +73,30 @@ namespace QuizAPI
 
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
+                // If Cors:AllowedOrigins is provided, lock CORS down to those origins (recommended for Azure).
+                // Otherwise, fall back to AllowAnyOrigin (legacy behavior).
+                var allowedOrigins =
+                    Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                    ?? (Configuration["Cors:AllowedOrigins"] ?? "")
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim())
+                        .Where(s => !string.IsNullOrEmpty(s))
+                        .ToArray();
+
+                if (allowedOrigins != null && allowedOrigins.Length > 0)
+                {
+                    builder
+                        .WithOrigins(allowedOrigins)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                }
+                else
+                {
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                }
             }));
 
             services.Configure<MvcOptions>(options =>
@@ -104,16 +148,16 @@ namespace QuizAPI
             {
                 //The signing key must match !
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
+                IssuerSigningKey = _signingKey,
 
                 //Validate the JWT Issuer (iss) claim
                 ValidateIssuer = true,
-                ValidIssuer = issure,
+                ValidIssuer = _jwtIssuer,
 
                 //validate the JWT Audience (aud) claim
 
                 ValidateAudience = true,
-                ValidAudience = audience,
+                ValidAudience = _jwtAudience,
 
                 //validate the token expiry
                 ValidateLifetime = true,
@@ -132,6 +176,20 @@ namespace QuizAPI
                 options.TokenValidationParameters = tokenValidationParameters;
             });
 
+            // Provide TokenProviderOptions via configuration so controllers can generate tokens using the same key.
+            services.Configure<TokenProviderOptions>(options =>
+            {
+                options.Issuer = _jwtIssuer;
+                options.Audience = _jwtAudience;
+
+                // Optional: override expiration days via config (defaults to TokenProviderOptions default).
+                if (int.TryParse(Configuration["Jwt:ExpirationDays"], out var expirationDays) && expirationDays > 0)
+                {
+                    options.Expiration = TimeSpan.FromDays(expirationDays);
+                }
+
+                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+            });
 
             services.AddAuthorization(options =>
             {
@@ -210,9 +268,9 @@ namespace QuizAPI
 
             var jwtOptions = new TokenProviderOptions
             {
-                Audience = audience,
-                Issuer = issure,
-                SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                Audience = _jwtAudience,
+                Issuer = _jwtIssuer,
+                SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256)
             };
 
             

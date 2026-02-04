@@ -7,6 +7,6 @@ namespace QuizAPI.Models.Questionnaire
 {
     public class QuestionnaireQuestionChoiceTextInputViewModel : QuestionnaireQuestionChoiceViewModel
     {
-        public int MaxCharacterCount { get; set; }
+        public new int MaxCharacterCount { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizAPI.Data;
+using QuizAPI.Mapping;
 using QuizAPI.Models;
 using QuizAPI.Models.Course;
 using QuizAPI.Models.Course.ViewModels;
@@ -39,7 +40,8 @@ namespace QuizAPI.Controllers.QuestionsController
     public class SimpleClickableController : Controller
     {
         private readonly IMapper _mapper;
-        public const string FILES_PATH = "http://167.86.98.171:6001/Files/";
+        // Prefer centrally configured base URL (set via appsettings / Azure App Service config).
+        private static string FILES_PATH => MappingProfile.FILES_PATH;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager<BaseUser> _userManager;
         const int CLICKABLE_QUESTION_PARAMETER = +1;

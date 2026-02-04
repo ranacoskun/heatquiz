@@ -54,7 +54,9 @@ namespace QuizAPI.Mapping
 {
     public class MappingProfile : Profile
     {
-        public const string FILES_PATH = "http://167.86.98.171:6001/Files/";//"http://localhost:54062/Files/";//
+        // Configurable at runtime from Startup (Azure App Service should override via env var / app settings).
+        // Expected format: "https://<your-backend>.azurewebsites.net/Files" (NO trailing slash).
+        public static string FILES_PATH = "http://167.86.98.171:6001/Files";
 
         public MappingProfile()
         {

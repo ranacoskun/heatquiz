@@ -7,8 +7,8 @@ namespace QuizAPI.Models.Questionnaire
 {
     public class QuestionnaireQuestionChoiceRangeInputViewModel : QuestionnaireQuestionChoiceViewModel
     {
-        public double Start { get; set; }
-        public double End { get; set; }
-        public double Step { get; set; }
+        public new double Start { get; set; }
+        public new double End { get; set; }
+        public new double Step { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using QuizAPI.Data;
 using QuizAPI.Mapping;
+using QuizAPI.Mapping;
 using QuizAPI.Middleware;
 using QuizAPI.Models;
 using System;
@@ -42,7 +43,8 @@ namespace QuizAPI.Controllers.AccountController
         private readonly List<string> ALLOWED_ROLES = new List<string>() { "course_editor", "content_editor" };
         private readonly List<string> NOTALLOWED_NAMES = new List<string>() { "admin", "student" };
 
-        private const string FILES_PATH = "http://167.86.98.171:6001/Files/";//;//"http://localhost:54062/Files/";//
+        // Prefer the centrally configured base URL so Azure deployments don't return hardcoded legacy hosts.
+        private static string FILES_PATH => MappingProfile.FILES_PATH;
 
         public AccountController(
             UserManager<BaseUser> userManager,
