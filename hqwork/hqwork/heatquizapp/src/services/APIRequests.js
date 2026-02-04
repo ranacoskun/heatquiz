@@ -9,7 +9,31 @@ import { getCurrentDatapool } from "./Datapools";
 const normalizeApiBase = (value) => {
   const v = (value || '').trim();
   if (!v) return null;
-  return v.endsWith('/') ? v : `${v}/`;
+
+  // Accept either:
+  // - https://<app>.azurewebsites.net/api/
+  // - https://<app>.azurewebsites.net/        (we'll append /api/)
+  // - https://<app>.azurewebsites.net/api     (we'll normalize trailing slash)
+  try {
+    const u = new URL(v, window.location.origin);
+    let p = u.pathname || '/';
+    if (!p.endsWith('/')) p += '/';
+
+    // If the caller didn't include /api/ anywhere in the path, append it.
+    if (!p.toLowerCase().includes('/api/')) {
+      if (!p.endsWith('/')) p += '/';
+      p += 'api/';
+    }
+
+    u.pathname = p;
+    u.search = '';
+    u.hash = '';
+    return u.toString();
+  } catch {
+    let base = v.endsWith('/') ? v : `${v}/`;
+    if (!base.toLowerCase().includes('/api/')) base += 'api/';
+    return base;
+  }
 };
 
 const Server =
