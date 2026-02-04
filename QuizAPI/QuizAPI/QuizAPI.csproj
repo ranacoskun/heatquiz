@@ -37,7 +37,8 @@
 
   <ItemGroup>
     <!-- Ensure IIS/Azure App Service hosting config is included in publish output -->
-    <Content Include="web.config">
+    <!-- web.config is already included by default; use Update to avoid NETSDK1022 duplicate item error -->
+    <Content Update="web.config">
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
