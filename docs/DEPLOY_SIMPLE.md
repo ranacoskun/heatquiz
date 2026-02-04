@@ -7,6 +7,40 @@
 
 ## Azure Deployment Steps
 
+## ✅ If you want users to see your React UI (recommended)
+
+You should deploy **two things**:
+- **React UI** → Azure **Static Web Apps**
+- **API (QuizAPI)** → Azure **App Service**
+
+Your React app lives here:
+`hqwork/hqwork/heatquizapp`
+
+### Step R1 — Deploy React (Azure Static Web Apps)
+
+1. Azure Portal → **Create a resource**
+2. Search **Static Web Apps** → **Create**
+3. Fill the form:
+   - **Deployment source**: GitHub
+   - **Organization / Repository**: `ranacoskun/heatquiz`
+   - **Branch**: `master` (or your main branch)
+   - **Build preset**: React
+   - **App location**: `hqwork/hqwork/heatquizapp`
+   - **Api location**: *(leave empty)*
+   - **Output location**: `build`
+4. Create → wait for GitHub Actions to finish
+
+### Step R2 — Point React to your API
+
+React uses build-time env vars (do **not** commit `.env`).
+
+1. Open your Static Web App → **Environment variables**
+2. Add:
+   - `REACT_APP_API_SERVER` = `https://<YOUR-API-APP>.azurewebsites.net/api/`
+3. Trigger a rebuild (push a commit, or re-run the SWA GitHub Action)
+
+⚠️ **Do NOT put OpenAI keys in React (`REACT_APP_OPENAI_API_KEY`)** because users can extract them from the browser. Put secrets in the backend (App Service env vars) instead.
+
 ### ✅ Step 1: Create Account
 1. Go to https://azure.microsoft.com/free/
 2. Sign up (free tier available)
@@ -482,38 +516,6 @@ That means:
 - Check **"Log stream"** (left menu) for error messages
 - Verify connection string in **Environment variables / App settings**
 - Make sure database schema was imported
-
----
-
-## If the website shows a generic “Error. An error occurred while processing your request.”
-
-This means the app crashed on the server, but Azure is hiding the details.
-
-### Step 1 — Open logs
-App Service (`heatquiz`) → **Log stream**
-
-Refresh the site once, then look for the first exception in the log stream.
-
-### Step 2 — Most common fix: database connection string
-App Service → **Environment variables** → **App settings**
-
-Make sure you have:
-- `ConnectionStrings__DefaultConnection` = a valid Azure Postgres connection string
-
-Important details:
-- Database name must match where you imported the schema (often `postgres` unless you created `quizdb`)
-- Azure Postgres requires SSL, so include:
-  - `Ssl Mode=Require;Trust Server Certificate=true;`
-
-### Step 3 — Temporarily enable more detail (ONLY for debugging)
-In App Service → **Environment variables** → **App settings**, add:
-- `ASPNETCORE_ENVIRONMENT` = `Development`
-- `ASPNETCORE_DETAILEDERRORS` = `true`
-- `Logging__LogLevel__Default` = `Information`
-
-Click **Save** and let the app restart, then refresh the site and check **Log stream** again.
-
-⚠️ After you capture the error, set `ASPNETCORE_ENVIRONMENT` back to `Production` (or delete it).
 
 ---
 
