@@ -61,8 +61,8 @@
     <Content Remove="wwwroot\Tutorials\**\*.mp4" />
     <Content Remove="wwwroot\Tutorials\**\*.mp3" />
 
-    <!-- CourseaMap is huge; keep it excluded for now (can be moved to Azure Storage later) -->
-    <Content Remove="wwwroot\CourseaMap\**" />
+    <!-- CourseaMap can be large in some deployments. If App Service deploy size becomes an issue,
+         consider excluding it and serving via Azure Storage/CDN instead. -->
   </ItemGroup>
 
   <ItemGroup>
