@@ -18,10 +18,22 @@ jobs:
        id-token: write
        contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
+      - name: Setup Node.js (for React build)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "hqwork/hqwork/heatquizapp/package-lock.json"
+      - name: Install React deps
+        working-directory: ./hqwork/hqwork/heatquizapp
+        run: npm ci
+      - name: Build React app
+        working-directory: ./hqwork/hqwork/heatquizapp
+        run: npm run build
       - name: Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
       - name: Get Id Token
@@ -38,6 +50,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BRAVE_SMOKE_0073DB503 }}
           action: "upload"
+          skip_app_build: true
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "./hqwork/hqwork/heatquizapp" # App source code path
