@@ -11,7 +11,10 @@ namespace QuizAPI.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            // This backend is deployed as an API on Azure App Service.
+            // Returning the legacy SPA prerendering view requires NodeServices, which commonly fails on App Service
+            // and causes 502.3 timeouts. Keep root path lightweight and reliable.
+            return Ok(new { status = "ok", service = "QuizAPI" });
         }
 
         public IActionResult Error()

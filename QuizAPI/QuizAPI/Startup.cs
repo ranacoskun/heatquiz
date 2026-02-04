@@ -280,9 +280,16 @@ namespace QuizAPI
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                // The legacy SPA fallback route requires SPA assets + optional NodeServices prerendering.
+                // When hosting the frontend separately (Azure Static Web Apps), keep the backend API-only.
+                // To re-enable SPA fallback, set Spa:EnableFallback=true (or env var Spa__EnableFallback=true).
+                var enableSpaFallback = env.IsDevelopment() || Configuration.GetValue<bool>("Spa:EnableFallback");
+                if (enableSpaFallback)
+                {
+                    routes.MapSpaFallbackRoute(
+                        name: "spa-fallback",
+                        defaults: new { controller = "Home", action = "Index" });
+                }
             });
 
             //Seeder.SeedAdminAndRoles();
