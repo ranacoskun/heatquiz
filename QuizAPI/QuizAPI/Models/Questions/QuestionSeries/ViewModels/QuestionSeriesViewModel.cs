@@ -27,7 +27,7 @@ namespace QuizAPI.Models.Questions.QuestionSeries.ViewModels
 
         public List<CourseMapElement_SIMPLEViewModel> MapElements { get; set; } = new List<CourseMapElement_SIMPLEViewModel>();
 
-        public int DataPoolId { get; set; }
+        public new int DataPoolId { get; set; }
 
         public int NumberOfPools { get; set; }
 

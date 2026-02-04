@@ -9,12 +9,13 @@ using QuizAPI.Models;
 using QuizAPI.Models.Information;
 using QuizAPI.Models.Information.ViewModels;
 using QuizAPI.Models.Questions;
+using QuizAPI.Controllers.QuestionsController;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static QuizAPI.Controllers.QuestionsController.SimpleClickableController;
+using QuizAPI.Mapping;
 using static QuizAPI.Utilities.Utilities;
 
 namespace QuizAPI.Controllers.InformationController
@@ -23,6 +24,8 @@ namespace QuizAPI.Controllers.InformationController
     [Route("api/[controller]")]
     public class InformationController : Controller
     {
+        private static string FILES_PATH => MappingProfile.FILES_PATH;
+
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager<BaseUser> _userManager;
@@ -90,13 +93,13 @@ namespace QuizAPI.Controllers.InformationController
               .Select(q => q.Code[0])
               .ToListAsync();
 
-            var Codes = new List<Code_Number>();
+            var Codes = new List<SimpleClickableController.Code_Number>();
 
             foreach (var c in CodesNumbers)
             {
                 if (Codes.Count == 0)
                 {
-                    Codes.Add(new Code_Number()
+                    Codes.Add(new SimpleClickableController.Code_Number()
                     {
                         Code = c,
                         Number = 1
@@ -111,7 +114,7 @@ namespace QuizAPI.Controllers.InformationController
                 }
                 else
                 {
-                    Codes.Add(new Code_Number()
+                    Codes.Add(new SimpleClickableController.Code_Number()
                     {
                         Code = c,
                         Number = 1
@@ -172,13 +175,13 @@ namespace QuizAPI.Controllers.InformationController
                .Select(q => q.Code[0])
                .ToListAsync();
 
-             var Codes = new List<Code_Number>();
+             var Codes = new List<SimpleClickableController.Code_Number>();
 
              foreach (var c in CodesNumbers)
              {
                  if (Codes.Count == 0)
                  {
-                     Codes.Add(new Code_Number()
+                     Codes.Add(new SimpleClickableController.Code_Number()
                      {
                          Code = c,
                          Number = 1
@@ -193,7 +196,7 @@ namespace QuizAPI.Controllers.InformationController
                  }
                  else
                  {
-                     Codes.Add(new Code_Number()
+                     Codes.Add(new SimpleClickableController.Code_Number()
                      {
                          Code = c,
                          Number = 1
@@ -309,13 +312,13 @@ namespace QuizAPI.Controllers.InformationController
               .Select(q => q.Code[0])
               .ToListAsync();
 
-            var Codes = new List<Code_Number>();
+            var Codes = new List<SimpleClickableController.Code_Number>();
 
             foreach (var c in CodesNumbers)
             {
                 if (Codes.Count == 0)
                 {
-                    Codes.Add(new Code_Number()
+                    Codes.Add(new SimpleClickableController.Code_Number()
                     {
                         Code = c,
                         Number = 1
@@ -330,7 +333,7 @@ namespace QuizAPI.Controllers.InformationController
                 }
                 else
                 {
-                    Codes.Add(new Code_Number()
+                    Codes.Add(new SimpleClickableController.Code_Number()
                     {
                         Code = c,
                         Number = 1

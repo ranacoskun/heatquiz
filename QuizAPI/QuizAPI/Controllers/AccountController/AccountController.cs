@@ -11,7 +11,6 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using QuizAPI.Data;
 using QuizAPI.Mapping;
-using QuizAPI.Mapping;
 using QuizAPI.Middleware;
 using QuizAPI.Models;
 using System;
