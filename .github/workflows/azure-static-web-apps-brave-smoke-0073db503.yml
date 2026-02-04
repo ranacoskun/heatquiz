@@ -35,6 +35,11 @@ jobs:
         working-directory: ./hqwork/hqwork/heatquizapp
         env:
           CI: "false"
+          # CRA env vars are baked in at build time. This must be set here (or at job env) so the
+          # deployed bundle does NOT call localhost.
+          # Configure this value in GitHub: Settings → Secrets and variables → Actions → Secrets
+          # Example value: https://<YOUR-QUIZAPI>.azurewebsites.net/api/
+          REACT_APP_API_SERVER: ${{ secrets.REACT_APP_API_SERVER }}
         run: npm run build
       - name: Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
