@@ -26,6 +26,19 @@ const getLLMApiUrl = () => {
   return process.env.REACT_APP_LLM_API_URL || 'https://api.openai.com/v1/chat/completions';
 };
 
+// Backend API base URL (for calling your own QuizAPI endpoints)
+// NOTE: CRA env vars are build-time. If REACT_APP_API_SERVER isn't set in Azure Static Web Apps build,
+// we fall back to same-origin /api/ (only works if you proxy /api to your backend).
+const normalizeApiBase = (value) => {
+  const v = (value || '').trim();
+  if (!v) return null;
+  return v.endsWith('/') ? v : `${v}/`;
+};
+
+const getBackendApiBase = () =>
+  normalizeApiBase(process.env.REACT_APP_API_SERVER) ||
+  `${window.location.origin}/api/`;
+
 /**
  * Generate a personalized performance recap using LLM
  * @param {Object} performanceData - Extracted performance data
@@ -166,7 +179,7 @@ const buildPerformancePrompt = (performanceData) => {
  * @returns {Promise<string>} - Generated recap text
  */
 export const generatePerformanceRecapViaBackend = async (performanceData) => {
-  const Server = process.env.REACT_APP_API_SERVER || 'http://localhost:6001/api/';
+  const Server = getBackendApiBase();
   
   try {
     const response = await axios.post(
@@ -502,7 +515,7 @@ const parseGoalJudgments = (content, goals) => {
  * Backend versions of the new functions
  */
 export const generateGoalJudgmentsViaBackend = async (goals, performanceData) => {
-  const Server = process.env.REACT_APP_API_SERVER || 'http://localhost:6001/api/';
+  const Server = getBackendApiBase();
   
   try {
     const response = await axios.post(
@@ -527,7 +540,7 @@ export const generateGoalJudgmentsViaBackend = async (goals, performanceData) =>
 };
 
 export const generateLearningPatternAnalysisViaBackend = async (performanceData) => {
-  const Server = process.env.REACT_APP_API_SERVER || 'http://localhost:6001/api/';
+  const Server = getBackendApiBase();
   
   try {
     const response = await axios.post(
