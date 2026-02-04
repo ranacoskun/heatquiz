@@ -35,6 +35,13 @@
     <Content Remove="ClientApp\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Ensure IIS/Azure App Service hosting config is included in publish output -->
+    <Content Include="web.config">
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
   <!--
     IMPORTANT (Azure App Service deployment):
     `wwwroot` in this repo contains multiple GB of course media (mp4/mp3, large images).
