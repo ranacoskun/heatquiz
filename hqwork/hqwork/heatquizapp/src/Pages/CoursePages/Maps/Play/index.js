@@ -642,8 +642,23 @@ export function MapPlay(){
 
     }
 
+    const map31AllowedSeriesCodes = [
+        "Conduction Heat Transfer Resistances 1",
+        "Conduction Dimensionless Numbers 1",
+        "Conduction Unit Quiz",
+    ]
+
+    const filterMapElements = (elements) => {
+        if (!map || map.Id !== 31) return elements
+        return elements.filter((e) => {
+            const code = e?.QuestionSeries?.Code
+            return code && map31AllowedSeriesCodes.includes(code)
+        })
+    }
+
     const renderMap = () => {
         const {LargeMapURL, LargeMapWidth, LargeMapLength, Title, Elements} = map
+        const filteredElements = filterMapElements(Elements)
 
         const imageWidth = imageBaseWidth 
         const imageHeight = (LargeMapLength/LargeMapWidth) * imageWidth
@@ -656,8 +671,8 @@ export function MapPlay(){
                     style={{width: imageWidth, height: imageHeight}}
                 />
 
-                {Elements.map((e) => renderElement(e))}
-                {Elements.filter(e => e.Badge_X && e.Badge_Y && e.Badges.length).map((e) => renderBadge(e))}
+                {filteredElements.map((e) => renderElement(e))}
+                {filteredElements.filter(e => e.Badge_X && e.Badge_Y && e.Badges.length).map((e) => renderBadge(e))}
 
                 
             </div>
