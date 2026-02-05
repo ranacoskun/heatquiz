@@ -78,7 +78,7 @@ export const generatePerformanceRecap = async (performanceData) => {
   }
 
   const apiUrl = getLLMApiUrl();
-  const model = process.env.REACT_APP_LLM_MODEL || 'gpt-3.5-turbo';
+  const model = process.env.REACT_APP_LLM_MODEL || 'gpt-4o-mini';
   
   // Debug logging
   console.log('LLM Service Config:', {
@@ -243,7 +243,7 @@ export const generateGoalJudgments = async (goals, performanceData) => {
   }
 
   const apiUrl = getLLMApiUrl();
-  const model = process.env.REACT_APP_LLM_MODEL || 'gpt-3.5-turbo';
+  const model = process.env.REACT_APP_LLM_MODEL || 'gpt-4o-mini';
 
   const prompt = buildGoalJudgmentPrompt(goals, performanceData);
 
@@ -307,7 +307,7 @@ export const generateLearningPatternAnalysis = async (performanceData) => {
   }
 
   const apiUrl = getLLMApiUrl();
-  const model = process.env.REACT_APP_LLM_MODEL || 'gpt-3.5-turbo';
+  const model = process.env.REACT_APP_LLM_MODEL || 'gpt-4o-mini';
 
   const prompt = buildLearningPatternPrompt(performanceData);
 

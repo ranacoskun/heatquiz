@@ -130,6 +130,16 @@ namespace QuizAPI
 
             #endregion
 
+            #region LLM (server-side OpenAI client)
+
+            // Keep OpenAI key on the server. Configure in Azure App Service:
+            // - OpenAI__ApiKey or OPENAI_API_KEY
+            // - OpenAI__Model  or OPENAI_MODEL (optional)
+            // - OpenAI__ApiUrl or OPENAI_API_URL (optional)
+            services.AddSingleton<OpenAiChatService>();
+
+            #endregion
+
             #region Authorization
 
             services.AddIdentity<BaseUser, IdentityRole>(o =>
