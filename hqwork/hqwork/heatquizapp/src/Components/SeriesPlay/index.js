@@ -81,6 +81,12 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
        if(currentPlayerKey) loadData();
     }, [Code, currentPlayerKey])
 
+    const limitSeriesElements = (elements) => {
+        // Frontend-only cap for Map 31 quizzes
+        if (String(mapId) !== "31") return elements
+        return (elements || []).slice(0, 5)
+    }
+
     useEffect(() => {
         if(Series){
 
@@ -97,6 +103,8 @@ export function SeriesPlay({Code, onExitSeries, onFinishPlaySeries, mapKey, mapN
             else{
                 elements = Elements
             }
+
+            elements = limitSeriesElements(elements)
 
             setSeriesElements(elements)
 
