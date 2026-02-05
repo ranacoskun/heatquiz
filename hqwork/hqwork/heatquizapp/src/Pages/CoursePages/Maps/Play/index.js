@@ -43,7 +43,7 @@ export function MapPlay(){
 
     const [imageIntialWidth, setImageIntialWidth] = useState(0)
     const [imageBaseWidth, setImageBaseWidth] = useState(0)
-    const [topOffset, setTopOffset] = useState(0)
+    // Map overlays should be anchored to the map container, not parent padding
 
     const baseRef = React.createRef()
     const [zoomScaleIndex, setZoomScaleIndex] = useState(0)
@@ -104,13 +104,9 @@ export function MapPlay(){
         if(map && baseRef){
             const styles = baseRef.current.getBoundingClientRect()
             const width = styles.width
-            
-            const parentStyles = window.getComputedStyle(baseRef.current.parentNode)
-            const offset = parseInt(parentStyles.getPropertyValue('padding-top').replace('px', ' '))
 
             setImageIntialWidth(width)
             setImageBaseWidth(width)
-            setTopOffset(offset)
         }
     }, [map])
 
@@ -119,14 +115,14 @@ export function MapPlay(){
         width: ((imageWidth)/BackgroundImageWidth)* p.Width,
         height: ((imageWidth)/BackgroundImageWidth)*p.Length ,
         left: ((imageWidth)/BackgroundImageWidth)*p.X,
-        top:  ((imageWidth)/BackgroundImageWidth)*p.Y + topOffset,
+        top:  ((imageWidth)/BackgroundImageWidth)*p.Y,
     })
 
     const getBadgePositionStyle = (imageWidth, BackgroundImageWidth, p) => ({
         width: ((imageWidth)/BackgroundImageWidth)* p.Badge_Width,
         height: ((imageWidth)/BackgroundImageWidth)*p.Badge_Length ,
         left: ((imageWidth)/BackgroundImageWidth)*p.Badge_X,
-        top:  ((imageWidth)/BackgroundImageWidth)*p.Badge_Y + topOffset,
+        top:  ((imageWidth)/BackgroundImageWidth)*p.Badge_Y,
     })
 
     const playSeriesActivate = (s, e) => {
@@ -664,7 +660,7 @@ export function MapPlay(){
         const imageHeight = (LargeMapLength/LargeMapWidth) * imageWidth
 
         return(
-            <div style={{width: imageWidth, height: imageHeight}}>
+            <div style={{width: imageWidth, height: imageHeight, position: 'relative'}}>
                 <img 
                     src={LargeMapURL}
                     alt={Title}
