@@ -3,6 +3,7 @@ import { Button, Card, Form, Input, Space, Typography, Spin, Tag, Divider, Row, 
 import { RocketOutlined, CheckCircleOutlined, BookOutlined, FilePdfOutlined, PlayCircleOutlined, LinkOutlined, ReadOutlined, CheckOutlined, BulbOutlined } from '@ant-design/icons';
 import { pdfjs } from 'react-pdf';
 import { getPdfTitle, getVideoTitle } from "../../../../services/ResourceTitles";
+import { map31Telemetry } from "../../../../services/Map31Telemetry";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -181,9 +182,10 @@ const VideoThumbnail = ({ url }) => {
     return null;
 };
 
-export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, isLoadingTopics, preparationResources }) {
+export function ForethoughtPhase({ onComplete, mapId, mapElementId, seriesId, playerKey, mapElementName, topicsSubtopics, isLoadingTopics, preparationResources }) {
     const [form] = Form.useForm();
     const [selectedGoals, setSelectedGoals] = useState([]);
+    const pageStartRef = useRef(Date.now());
 
     // Get the topic to use in goals - use mapElementName (quiz title) as the topic
     const quizTopic = mapElementName || 'this quiz';
@@ -210,6 +212,17 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
         if (formValues.customGoal && formValues.customGoal.trim()) {
             goals.push(formValues.customGoal.trim());
         }
+
+        map31Telemetry.track({
+            page: 'forethought',
+            section: 'cta',
+            eventName: 'submit_start_quiz',
+            metadata: {
+                goals_count: selectedGoals.length + (formValues.customGoal && formValues.customGoal.trim() ? 1 : 0),
+            }
+        });
+        map31Telemetry.flush();
+
         onComplete({
             goals: goals,
             expectations: '',
@@ -218,6 +231,45 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
     };
 
     const canProceed = selectedGoals.length > 0 || form.getFieldValue('customGoal');
+
+    useEffect(() => {
+        // New session starts at forethought for Map 31
+        map31Telemetry.startSession({
+            player: playerKey || null,
+            mapElementId: mapElementId ?? null,
+            seriesId: seriesId ?? null,
+            isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : null,
+            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+        });
+
+        map31Telemetry.track({
+            page: 'forethought',
+            section: 'header',
+            eventName: 'page_view',
+            metadata: { map_id: mapId, map_element_id: mapElementId, series_id: seriesId }
+        });
+
+        const onVisibility = () => {
+            if (document.visibilityState === 'hidden') {
+                map31Telemetry.flush();
+            }
+        };
+        document.addEventListener('visibilitychange', onVisibility);
+
+        return () => {
+            const durationMs = Date.now() - pageStartRef.current;
+            map31Telemetry.endSession({ totalDurationMs: durationMs });
+            map31Telemetry.track({
+                page: 'forethought',
+                section: 'header',
+                eventName: 'page_exit',
+                durationMs,
+                metadata: { map_id: mapId, map_element_id: mapElementId, series_id: seriesId }
+            });
+            map31Telemetry.flush();
+            document.removeEventListener('visibilitychange', onVisibility);
+        };
+    }, []);
 
     return (
         <div style={{
@@ -384,7 +436,23 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                                                 borderRadius: '4px'
                                                             }}
                                                             bodyStyle={{ padding: '8px 12px' }}
-                                                            onClick={() => window.open(pdf.url, '_blank', 'noopener,noreferrer')}
+                                                            onClick={() => {
+                                                                map31Telemetry.track({
+                                                                    page: 'forethought',
+                                                                    section: 'prep_materials',
+                                                                    eventName: 'resource_open',
+                                                                    targetType: 'resource',
+                                                                    targetId: `pdf_${index}`,
+                                                                    url: pdf.url,
+                                                                    metadata: {
+                                                                        resource_type: 'pdf',
+                                                                        source: pdf.source,
+                                                                        title: pdf.title || getPdfTitle(pdf.url, 'PDF Document'),
+                                                                    }
+                                                                });
+                                                                map31Telemetry.flush();
+                                                                window.open(pdf.url, '_blank', 'noopener,noreferrer');
+                                                            }}
                                                         >
                                                             <Space size="small" style={{ width: '100%' }}>
                                                                 <PDFThumbnail url={pdf.url} />
@@ -422,7 +490,23 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                                                 borderRadius: '4px'
                                                             }}
                                                             bodyStyle={{ padding: '8px 12px' }}
-                                                            onClick={() => window.open(video.url, '_blank', 'noopener,noreferrer')}
+                                                            onClick={() => {
+                                                                map31Telemetry.track({
+                                                                    page: 'forethought',
+                                                                    section: 'prep_materials',
+                                                                    eventName: 'resource_open',
+                                                                    targetType: 'resource',
+                                                                    targetId: `video_${index}`,
+                                                                    url: video.url,
+                                                                    metadata: {
+                                                                        resource_type: 'video',
+                                                                        source: video.source,
+                                                                        title: video.title || getVideoTitle(video.url, 'Video Resource'),
+                                                                    }
+                                                                });
+                                                                map31Telemetry.flush();
+                                                                window.open(video.url, '_blank', 'noopener,noreferrer');
+                                                            }}
                                                         >
                                                             <Space size="small" style={{ width: '100%' }}>
                                                                 <VideoThumbnail url={video.url} />
@@ -491,6 +575,18 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                                 const newSelection = selectedGoals.includes(index)
                                                     ? selectedGoals.filter(i => i !== index)
                                                     : [...selectedGoals, index];
+
+                                                map31Telemetry.track({
+                                                    page: 'forethought',
+                                                    section: 'goal_selection',
+                                                    eventName: selectedGoals.includes(index) ? 'goal_deselect' : 'goal_select',
+                                                    targetType: 'goal',
+                                                    targetId: String(index),
+                                                    metadata: {
+                                                        goal_index: index,
+                                                        category: goal.category,
+                                                    }
+                                                });
                                                 handleGoalChange(newSelection);
                                             }}
                                         >
@@ -520,6 +616,20 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                         placeholder="e.g., Focus on time management during the quiz"
                                         size="middle"
                                         prefix={<BulbOutlined style={{ color: '#faad14' }} />}
+                                        onBlur={(e) => {
+                                            const v = (e?.target?.value || '').trim();
+                                            if (v) {
+                                                map31Telemetry.track({
+                                                    page: 'forethought',
+                                                    section: 'goal_selection',
+                                                    eventName: 'custom_goal_edit',
+                                                    targetType: 'goal',
+                                                    targetId: 'custom',
+                                                    metadata: { length: v.length }
+                                                });
+                                                map31Telemetry.flush();
+                                            }
+                                        }}
                                     />
                                 </Form.Item>
                             </div>
@@ -531,6 +641,13 @@ export function ForethoughtPhase({ onComplete, mapElementName, topicsSubtopics, 
                                 size="middle"
                                 onClick={() => {
                                     // Allow skipping with minimal data
+                                    map31Telemetry.track({
+                                        page: 'forethought',
+                                        section: 'cta',
+                                        eventName: 'skip_setup',
+                                        metadata: { goals_count: selectedGoals.length }
+                                    });
+                                    map31Telemetry.flush();
                                     onComplete({
                                         goals: selectedGoals.length > 0 
                                             ? selectedGoals.map(index => predefinedGoals[index].text)

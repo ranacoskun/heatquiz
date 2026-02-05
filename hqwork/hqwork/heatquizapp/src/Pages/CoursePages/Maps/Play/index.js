@@ -772,6 +772,10 @@ const setLocalKey = () => {
                 {showForethoughtPhase && pendingMapElement &&
                     <ForethoughtPhase
                         onComplete={handleForethoughtComplete}
+                        mapId={id}
+                        mapElementId={pendingMapElement.Id}
+                        seriesId={pendingSeries?.Id}
+                        playerKey={currentPlayerKey}
                         mapElementName={pendingMapElement.Title}
                         topicsSubtopics={topicsSubtopics}
                         isLoadingTopics={isLoadingSeriesViewEdit}

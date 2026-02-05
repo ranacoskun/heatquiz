@@ -3,6 +3,8 @@ import { Card, Space, Typography, Progress, Spin, Alert, Button, Row, Col, Tag, 
 import { CheckCircleOutlined, TrophyOutlined, BulbOutlined, ReloadOutlined, RobotOutlined, FilePdfOutlined, PlayCircleOutlined, ExclamationCircleOutlined, AimOutlined, CloseCircleOutlined, StarFilled, ClockCircleOutlined, AreaChartOutlined } from '@ant-design/icons';
 import { generateGoalJudgments, generateGoalJudgmentsViaBackend, generateLearningPatternAnalysis, generateLearningPatternAnalysisViaBackend } from "../../services/LLMService";
 import { getPdfTitle, getVideoTitle } from "../../services/ResourceTitles";
+import { map31Telemetry } from "../../services/Map31Telemetry";
+import { useAuth } from "../../contexts/AuthContext";
 import { LatexRenderer } from "../LatexRenderer";
 import { DisplayClickableQuestionAnswers } from "./DisplayClickableQuestionAnswers";
 import { ViewSolutionComponent } from "../ViewSolutionComponent";
@@ -11,10 +13,12 @@ import { CLICKABLE_QUESTION_PARAMETER, DIAGRAM_QUESTION_PARAMETER, ENERGY_BALANC
 const { Title, Text, Paragraph } = Typography;
 
 export function SelfReflectionPhase({ totalQuestions, correctCount, playedElements, goals = [], seriesStatistics, seriesElements = [] }) {
+    const { currentPlayerKey } = useAuth();
     const [goalJudgments, setGoalJudgments] = useState([]);
     const [learningPatternAnalysis, setLearningPatternAnalysis] = useState(null);
     const [loadingSelfReflection, setLoadingSelfReflection] = useState(false);
     const [selfReflectionError, setSelfReflectionError] = useState(null);
+    const pageStartRef = React.useRef(Date.now());
     
     // Calculate percentage
     const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
@@ -177,6 +181,14 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
         setSelfReflectionError(null);
 
         try {
+            map31Telemetry.ensureSession({ player: currentPlayerKey || null });
+            map31Telemetry.track({
+                page: 'self_reflection',
+                section: 'goal_progress',
+                eventName: 'llm_generate_start',
+                targetType: 'llm',
+                targetId: 'goal_judgments'
+            });
             // Generate goal judgments
             let judgments;
             try {
@@ -186,8 +198,22 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                 judgments = await generateGoalJudgments(goals, performanceData);
             }
             setGoalJudgments(judgments);
+            map31Telemetry.track({
+                page: 'self_reflection',
+                section: 'goal_progress',
+                eventName: 'llm_generate_success',
+                targetType: 'llm',
+                targetId: 'goal_judgments'
+            });
 
             // Generate learning pattern analysis
+            map31Telemetry.track({
+                page: 'self_reflection',
+                section: 'learning_pattern_analysis',
+                eventName: 'llm_generate_start',
+                targetType: 'llm',
+                targetId: 'learning_pattern_analysis'
+            });
             let analysis;
             try {
                 analysis = await generateLearningPatternAnalysisViaBackend(performanceData);
@@ -196,11 +222,27 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                 analysis = await generateLearningPatternAnalysis(performanceData);
             }
             setLearningPatternAnalysis(analysis);
+            map31Telemetry.track({
+                page: 'self_reflection',
+                section: 'learning_pattern_analysis',
+                eventName: 'llm_generate_success',
+                targetType: 'llm',
+                targetId: 'learning_pattern_analysis'
+            });
         } catch (error) {
             console.error('Error generating self-reflection:', error);
             setSelfReflectionError(error.message || 'Failed to generate self-reflection. Please try again.');
+            map31Telemetry.track({
+                page: 'self_reflection',
+                section: 'goal_progress',
+                eventName: 'llm_generate_fail',
+                targetType: 'llm',
+                targetId: 'self_reflection',
+                metadata: { message: error?.message || String(error) }
+            });
         } finally {
             setLoadingSelfReflection(false);
+            map31Telemetry.flush();
         }
     };
 
@@ -210,6 +252,40 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
             generateSelfReflection();
         }
     }, [goals, playedElements]);
+
+    useEffect(() => {
+        map31Telemetry.ensureSession({
+            player: currentPlayerKey || null,
+            isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : null,
+            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+        }, true);
+
+        map31Telemetry.track({
+            page: 'self_reflection',
+            section: 'performance_summary',
+            eventName: 'page_view'
+        });
+
+        const onVisibility = () => {
+            if (document.visibilityState === 'hidden') {
+                map31Telemetry.flush();
+            }
+        };
+        document.addEventListener('visibilitychange', onVisibility);
+
+        return () => {
+            const durationMs = Date.now() - pageStartRef.current;
+            map31Telemetry.track({
+                page: 'self_reflection',
+                section: 'performance_summary',
+                eventName: 'page_exit',
+                durationMs
+            });
+            map31Telemetry.endSession({ totalDurationMs: durationMs });
+            map31Telemetry.flush();
+            document.removeEventListener('visibilitychange', onVisibility);
+        };
+    }, []);
 
     // Don't auto-generate - let user choose to use it
 
@@ -513,7 +589,19 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                                                                         <Button
                                                                             size="small"
                                                                             icon={<FilePdfOutlined />}
-                                                                            onClick={() => window.open(pdfLink, '_blank', 'noopener,noreferrer')}
+                                                                            onClick={() => {
+                                                                                map31Telemetry.track({
+                                                                                    page: 'self_reflection',
+                                                                                    section: 'question_recap',
+                                                                                    eventName: 'resource_open',
+                                                                                    targetType: 'resource',
+                                                                                    targetId: `question_pdf_${index}`,
+                                                                                    url: pdfLink,
+                                                                                    metadata: { resource_type: 'pdf', title: getPdfTitle(pdfLink, 'PDF') }
+                                                                                });
+                                                                                map31Telemetry.flush();
+                                                                                window.open(pdfLink, '_blank', 'noopener,noreferrer');
+                                                                            }}
                                                                         >
                                                                             {getPdfTitle(pdfLink, 'PDF')}
                                                                         </Button>
@@ -522,7 +610,19 @@ export function SelfReflectionPhase({ totalQuestions, correctCount, playedElemen
                                                                         <Button
                                                                             size="small"
                                                                             icon={<PlayCircleOutlined />}
-                                                                            onClick={() => window.open(videoLink, '_blank', 'noopener,noreferrer')}
+                                                                            onClick={() => {
+                                                                                map31Telemetry.track({
+                                                                                    page: 'self_reflection',
+                                                                                    section: 'question_recap',
+                                                                                    eventName: 'resource_open',
+                                                                                    targetType: 'resource',
+                                                                                    targetId: `question_video_${index}`,
+                                                                                    url: videoLink,
+                                                                                    metadata: { resource_type: 'video', title: getVideoTitle(videoLink, 'Video') }
+                                                                                });
+                                                                                map31Telemetry.flush();
+                                                                                window.open(videoLink, '_blank', 'noopener,noreferrer');
+                                                                            }}
                                                                         >
                                                                             {getVideoTitle(videoLink, 'Video')}
                                                                         </Button>
