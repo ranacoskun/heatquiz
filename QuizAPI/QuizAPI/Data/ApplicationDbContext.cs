@@ -31,6 +31,7 @@ using QuizAPI.Models.Questions.QuestionComment;
 using QuizAPI.Models.Questions.QuestionSeries;
 using QuizAPI.Models.Questions.SimpleClickableQuestion;
 using QuizAPI.Models.QuestionTemplates;
+using QuizAPI.Models.Telemetry;
 using QuizAPI.Models.Topic;
 using QuizAPI.Models.Tutorials;
 using System;
@@ -187,6 +188,10 @@ namespace QuizAPI.Data
         public DbSet<FeedbackQuestionEvent> FeedbackQuestionEvent { get; set; }
         
         public DbSet<DatapoolNotificationSubscription> DatapoolNotificationSubscriptions { get; set; }
+
+        // Telemetry (Map 31 only)
+        public DbSet<Map31TelemetrySession> Map31TelemetrySessions { get; set; }
+        public DbSet<Map31TelemetryEvent> Map31TelemetryEvents { get; set; }
         
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -268,6 +273,20 @@ namespace QuizAPI.Data
             .WithOne(q => q.QuestionnaireRelation)
             .HasForeignKey<QuestionnaireMapElementRelation>(a => a.MapElementId);
 
+            TelemetrySetup(builder);
+        }
+
+        private void TelemetrySetup(ModelBuilder builder)
+        {
+            builder.Entity<Map31TelemetrySession>()
+                .HasMany(s => s.Events)
+                .WithOne(e => e.Session)
+                .HasForeignKey(e => e.SessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Map31TelemetryEvent>()
+                .Property(e => e.Metadata)
+                .HasColumnType("jsonb");
         }
 
         /*private void KeyboardQuestionAnswerSetup(ModelBuilder builder)
