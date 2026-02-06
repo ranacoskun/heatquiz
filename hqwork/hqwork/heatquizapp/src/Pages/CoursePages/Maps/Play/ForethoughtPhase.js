@@ -8,9 +8,8 @@ import { map31Telemetry } from "../../../../services/Map31Telemetry";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-// Configure PDF.js worker - use local file from public folder to avoid CORS issues
-// The worker file is now in public/pdf.worker.min.js
-pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL || ''}/pdf.worker.min.js`;
+// Configure PDF.js worker to match the bundled pdfjs version.
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url) => {
