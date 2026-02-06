@@ -62,10 +62,24 @@ const findTitleForUrl = (url, type) => {
 };
 
 export const getPdfTitle = (url, fallback = "PDF") => {
-  return findTitleForUrl(url, "pdf") || fallback;
+  if (!url) return fallback;
+  const matchedTitle = findTitleForUrl(url, "pdf");
+  if (matchedTitle) return matchedTitle;
+  try {
+    const { pathname } = new URL(url, window.location.origin);
+    const filename = pathname.split("/").pop();
+    if (filename) {
+      const decoded = decodeURIComponent(filename);
+      return decoded || fallback;
+    }
+  } catch (err) {
+    // Ignore URL parse errors and fall back to default label.
+  }
+  return fallback;
 };
 
 export const getVideoTitle = (url, fallback = "Video") => {
+  if (!url) return fallback;
   return findTitleForUrl(url, "video") || fallback;
 };
 
