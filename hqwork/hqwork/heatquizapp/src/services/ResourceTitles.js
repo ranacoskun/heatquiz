@@ -47,6 +47,36 @@ const RESOURCE_TITLE_RULES = [
     type: "pdf",
   },
   {
+    match: "bi42mgrr.duo.pdf",
+    title: "Heat Transfer: Conduction - Biot number",
+    type: "pdf",
+  },
+  {
+    match: "afnderbb.r1q.pdf",
+    title: "Heat Transfer: Conduction - Introduction to the transient heat conduction",
+    type: "pdf",
+  },
+  {
+    match: "lgmhai1n.g0r.pdf",
+    title: "Heat Transfer: Conduction - Introduction to the topic of heat conduction",
+    type: "pdf",
+  },
+  {
+    match: "pw5puqmb.0bc.pdf",
+    title: "Heat Transfer: Conduction - Unsteady energy conservation equations",
+    type: "pdf",
+  },
+  {
+    match: "gp1ypbfm.la0.pdf",
+    title: "Heat Transfer: Conduction - Introduction to the topic of fins",
+    type: "pdf",
+  },
+  {
+    match: "fi5yblmy.zqv.pdf",
+    title: "Heat Transfer: Conduction - Introduction to the topic of convection and advective heat transfer",
+    type: "pdf",
+  },
+  {
     match: "reD_HHAYoDs",
     title: "Conduction 07: Multilayer wall with a convective heat transfer resistance",
     type: "video",
@@ -62,24 +92,10 @@ const findTitleForUrl = (url, type) => {
 };
 
 export const getPdfTitle = (url, fallback = "PDF") => {
-  if (!url) return fallback;
-  const matchedTitle = findTitleForUrl(url, "pdf");
-  if (matchedTitle) return matchedTitle;
-  try {
-    const { pathname } = new URL(url, window.location.origin);
-    const filename = pathname.split("/").pop();
-    if (filename) {
-      const decoded = decodeURIComponent(filename);
-      return decoded || fallback;
-    }
-  } catch (err) {
-    // Ignore URL parse errors and fall back to default label.
-  }
-  return fallback;
+  return findTitleForUrl(url, "pdf") || fallback;
 };
 
 export const getVideoTitle = (url, fallback = "Video") => {
-  if (!url) return fallback;
   return findTitleForUrl(url, "video") || fallback;
 };
 

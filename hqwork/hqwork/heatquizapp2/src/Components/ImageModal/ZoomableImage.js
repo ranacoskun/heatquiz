@@ -19,7 +19,7 @@ useEffect(() => {
     setViewer(
       OpenSeaDragon({
         id: "openSeaDragon",
-        prefixUrl: "openseadragon-images/",
+        prefixUrl: `${process.env.PUBLIC_URL}/openseadragon-images/`,
         animationTime: 0.5,
         blendTime: 0.1,
         constrainDuringPan: true,
