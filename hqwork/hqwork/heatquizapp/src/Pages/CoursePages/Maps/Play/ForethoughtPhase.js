@@ -39,7 +39,7 @@ const PDFThumbnail = ({ url }) => {
             try {
                 setLoading(true);
                 setError(false);
-                const loadingTask = pdfjs.getDocument({ url, httpHeaders: { 'Access-Control-Allow-Origin': '*' } });
+                const loadingTask = pdfjs.getDocument({ url });
                 const pdf = await loadingTask.promise;
                 
                 if (pdf.numPages > 0) {

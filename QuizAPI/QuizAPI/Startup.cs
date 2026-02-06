@@ -264,7 +264,34 @@ namespace QuizAPI
             {
                 FileProvider = new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-                RequestPath = "/Files"
+                RequestPath = "/Files",
+                OnPrepareResponse = ctx =>
+                {
+                    var allowedOrigins =
+                        Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                        ?? (Configuration["Cors:AllowedOrigins"] ?? "")
+                            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => s.Trim())
+                            .Where(s => !string.IsNullOrEmpty(s))
+                            .ToArray();
+
+                    var origin = ctx.Context.Request.Headers["Origin"].ToString();
+                    if (!string.IsNullOrEmpty(origin))
+                    {
+                        if (allowedOrigins != null && allowedOrigins.Length > 0)
+                        {
+                            if (allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase))
+                            {
+                                ctx.Context.Response.Headers["Access-Control-Allow-Origin"] = origin;
+                                ctx.Context.Response.Headers["Vary"] = "Origin";
+                            }
+                        }
+                        else
+                        {
+                            ctx.Context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+                        }
+                    }
+                }
             });
 
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
